@@ -1,15 +1,20 @@
-#include <iostream>
-
-using namespace std;
+#include <stdio.h>
 
 int main()
 {
-    double t_cel;
-    cout << "Enter a temperature in Celsius: ";
-    cin >> t_cel;
+    FILE *inputFile;
+    inputFile = fopen("input.txt", "r");
 
-    double t_fahr = (t_cel*1.8) + 32;
-    cout << t_cel << " Celsius = " << t_fahr << " Fahrenheit!" << endl;
+    const int numValues = 6;
+    float celValues[numValues];
+
+    for (int i=0; i<numValues; i++)
+    {
+        fscanf(inputFile, "%f", &celValues[i]);
+        float t_fahr = (celValues[i]*1.8) + 32;
+        printf("%.2f Celsius = %.2f Fahrenheit!\n", celValues[i], t_fahr);
+    }
 
     return 0;
+
 }
