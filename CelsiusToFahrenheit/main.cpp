@@ -1,12 +1,18 @@
 #include <stdio.h>
+#include <vector>
 
 int main()
 {
+    // Reads a list of temperature values in Celsius
+    // from a file and converts them to Fahrenheit
+    using std::vector;
+
     FILE *inputFile;
     inputFile = fopen("input.txt", "r");
 
-    const int numValues = 6;
-    float celValues[numValues];
+    int numValues;
+    fscanf(inputFile, "%d", &numValues);
+    vector<float> celValues(numValues);
 
     for (int i=0; i<numValues; i++)
     {
