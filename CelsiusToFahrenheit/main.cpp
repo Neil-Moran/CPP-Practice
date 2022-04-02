@@ -10,10 +10,12 @@ int main()
     FILE *inputFile;
     inputFile = fopen("input.txt", "r");
 
+    // The first value in the file indicates the number of values
     int numValues;
     fscanf(inputFile, "%d", &numValues);
     vector<float> celValues(numValues);
 
+    // Read and convert the temperature values
     for (int i=0; i<numValues; i++)
     {
         fscanf(inputFile, "%f", &celValues[i]);
