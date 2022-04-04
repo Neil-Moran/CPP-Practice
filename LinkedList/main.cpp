@@ -3,9 +3,9 @@
 int main() 
 {
     LinkedList list;
-    list.add(new Node(1));
-    list.add(new Node(5));
-    list.add(new Node(72));
+    list += new Node(1);
+    list += new Node(5);
+    list += new Node(72);
 
     list.print();
 

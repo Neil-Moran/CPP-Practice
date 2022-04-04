@@ -67,6 +67,12 @@ struct LinkedList
         return;
     }
 
+    LinkedList& operator+=(Node *n)
+    {
+        add(n);
+        return *this;
+    }
+
     void print()
     {
         if(head == 0)
