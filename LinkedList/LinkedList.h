@@ -15,7 +15,7 @@ struct Node
     ~Node()
     {
         if(next != 0)
-            next->~Node();
+            delete next;
         printf("Destroying Node: %d\n", value);
     }
 
@@ -26,9 +26,7 @@ struct Node
         if(next == 0)
             printf("END\n");
         
-        else next->print();
-        
-        return;
+        else next->print();        
     }
 };
 
@@ -45,7 +43,7 @@ struct LinkedList
     ~LinkedList()
     {
         if(head != 0)
-            head->~Node();
+            delete head;
         printf("Destroying List\n");
     }
     
@@ -60,7 +58,6 @@ struct LinkedList
 
         tail->next = n;
         tail = n;
-        return;
     }
 
     void insert(Node *n) //insert a node into the list, numerical order
@@ -96,8 +93,6 @@ struct LinkedList
 
         prev->next = n;
         n->next = curr;
-
-        return;
     }
 
     void reverse()
@@ -125,9 +120,7 @@ struct LinkedList
 
         //swap head and tail
         tail = head;
-        head = curr;                
-
-        return;
+        head = curr;
     }
 
     LinkedList& operator+=(Node *n)
@@ -142,6 +135,5 @@ struct LinkedList
             printf("EMPTY LIST\n");
         
         else head->print();
-        return;
     }
 };
