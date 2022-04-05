@@ -6,10 +6,10 @@ void addFromFile(LinkedList &list, char *filename);
 int main() 
 {
     LinkedList list;
+    list.print(); // EMPTY LIST
 
-    addFromFile(list, "input.txt");
-
-    list.print();
+    addFromFile(list, "primes.txt");
+    list.print(); // list of first ten prime numbers
 
     return 0;
 }
