@@ -100,6 +100,36 @@ struct LinkedList
         return;
     }
 
+    void reverse()
+    {
+        Node *prev = 0;
+        Node *curr = head;
+        Node *next = 0;
+
+        bool complete = false;
+        
+        while(!complete)
+        {            
+            next = curr->next; //store next node before we overwrite it
+            curr->next = prev; //reverse
+
+            if (curr == tail)
+                complete = true;
+
+            else //move to next node
+            {
+                prev = curr;
+                curr = next;
+            }
+        }
+
+        //swap head and tail
+        tail = head;
+        head = curr;                
+
+        return;
+    }
+
     LinkedList& operator+=(Node *n)
     {
         add(n);

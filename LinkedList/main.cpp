@@ -18,6 +18,9 @@ int main()
         LinkedList listOrdered;
         insertFromFile(listOrdered, "scrambledNumbers.txt");
         listOrdered.print(); // list of 1-20 ordered
+
+        listOrdered.reverse();
+        listOrdered.print(); // reversed list of 20-1
     }
 
     return 0;
