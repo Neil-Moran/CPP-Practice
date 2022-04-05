@@ -49,7 +49,7 @@ struct LinkedList
         printf("Destroying List\n");
     }
     
-    void add(Node *n)
+    void add(Node *n) //add a node to the end of the list, no ordering
     {
         if(head == 0) //empty list
         {
@@ -60,6 +60,43 @@ struct LinkedList
 
         tail->next = n;
         tail = n;
+        return;
+    }
+
+    void insert(Node *n) //insert a node into the list, numerical order
+    {
+        if(head == 0) //empty list
+        {
+            head = n;
+            tail = n;
+            return;
+        }
+
+        if(n->value <= head->value) //new head
+        {
+            n->next = head;
+            head = n;
+            return;
+        }
+
+        if(n->value >= tail->value) //new tail
+        {
+            tail->next = n;
+            tail = n;
+            return;
+        }
+
+        Node *prev = head;
+        Node *curr = head->next;
+        while(n->value > curr->value)
+        {
+            prev = curr;
+            curr = curr->next;
+        }
+
+        prev->next = n;
+        n->next = curr;
+
         return;
     }
 

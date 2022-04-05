@@ -5,11 +5,23 @@ void addFromFile(LinkedList &list, char *filename);
 
 int main() 
 {
-    LinkedList list;
-    list.print(); // EMPTY LIST
+    {
+        LinkedList listPrimes;
+        listPrimes.print(); // EMPTY LIST
 
-    addFromFile(list, "primes.txt");
-    list.print(); // list of first ten prime numbers
+        addFromFile(listPrimes, "primes.txt");
+        listPrimes.print(); // list of first ten prime numbers
+    }
+
+    {
+        LinkedList listOrdered;
+        listOrdered.insert(new Node(4));
+        listOrdered.insert(new Node(1));
+        listOrdered.insert(new Node(3));
+        listOrdered.insert(new Node(5));
+        listOrdered.insert(new Node(2));
+        listOrdered.print(); // list of 1-5 ordered
+    }
 
     return 0;
 }
