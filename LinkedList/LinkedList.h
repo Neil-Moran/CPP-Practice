@@ -34,11 +34,12 @@ struct Node
 
 struct LinkedList 
 {
-    Node *head;
+    Node *head, *tail;
 
     LinkedList()
     {
         head = 0;
+        tail = 0;
     }
 
     ~LinkedList()
@@ -50,20 +51,15 @@ struct LinkedList
     
     void add(Node *n)
     {
-        if(head == 0)
+        if(head == 0) //empty list
         {
             head = n;
+            tail = n;
             return;
         }
 
-        Node *curr = head;
-
-        while(curr->next != 0)
-        {
-            curr = curr->next;
-        }
-
-        curr->next = n;
+        tail->next = n;
+        tail = n;
         return;
     }
 
