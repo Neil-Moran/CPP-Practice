@@ -47,6 +47,22 @@ void Node::printRecursive()
         right->printRecursive();
 };
 
+void Node::printTree(int depth = 0)
+{
+    for(int i=0; i< depth-1; ++i)
+    {
+        printf("   ");
+    }
+    if(depth != 0)
+        printf("\\->");
+
+    printf("%d\n", value);
+    if(right != 0)
+        right->printTree(depth+1);
+    if(left != 0)
+        left->printTree(depth+1);
+};
+
 void BinaryTree::add(Node *n)
 {
     if(root == 0) //empty tree
@@ -60,7 +76,6 @@ void BinaryTree::add(Node *n)
 
 void BinaryTree::find(int target)
 {
-
     if(root == 0)
     {
         printf("Empty tree, value: %d not found\n", target);
@@ -79,5 +94,13 @@ void BinaryTree::print()
     if(root == 0)
         printf("EMPTY TREE");
     else root->printRecursive();
+    printf("\n");
+};
+
+void BinaryTree::printAsTree()
+{
+    if(root == 0)
+        printf("EMPTY TREE");
+    else root->printTree();
     printf("\n");
 };

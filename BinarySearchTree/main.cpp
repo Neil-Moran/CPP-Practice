@@ -10,7 +10,8 @@ int main()
     tree.find(14);  //empty tree, not found
 
     addFromFile(tree, "scrambledNumbers.txt");
-    tree.print();   //1-20
+    tree.print();       //1-20
+    tree.printAsTree(); //print tree structure
 
     tree.find(14);  //found
     tree.find(4);   //found, root
