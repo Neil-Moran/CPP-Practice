@@ -4,6 +4,8 @@ struct Node
     Node *left, *right;
 
     Node(int v);
+
+    void add(Node *n);
 };
 
 
