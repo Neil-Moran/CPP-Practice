@@ -7,6 +7,7 @@ struct Node
 
     void add(Node *n);
     int findRecursive(int target, int depth);
+    int calcDepthRecursive(int currentDepth);
     void printRecursive();
     void printTree(int depth);
 };
@@ -17,6 +18,7 @@ struct BinaryTree
 
     void add(Node *n);
     void find(int target);
+    int calcDepth();
     void print();
     void printAsTree();
 };

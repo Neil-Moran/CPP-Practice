@@ -2,16 +2,19 @@
 #include "BinaryTree.h"
 
 void addFromFile(BinaryTree &tree, char *filename);
+void printDepth(BinaryTree &tree);
 
 int main()
 {
     BinaryTree tree;
-    tree.print();   //EMPTY TREE
-    tree.find(14);  //empty tree, not found
+    tree.print();       //EMPTY TREE
+    tree.find(14);      //empty tree, not found
+    printDepth(tree);   //empty
 
     addFromFile(tree, "scrambledNumbers.txt");
     tree.print();       //1-20
     tree.printAsTree(); //print tree structure
+    printDepth(tree);   //depth: 6
 
     tree.find(14);  //found
     tree.find(4);   //found, root
@@ -35,4 +38,16 @@ void addFromFile(BinaryTree &tree, char *filename)
         fscanf_s(file, "%d", &v);
         tree.add(new Node(v));
     }
+}
+
+void printDepth(BinaryTree &tree)
+{
+    printf("Tree Depth: ");
+
+    int depth = tree.calcDepth();
+
+    if (depth == -1)
+        printf("Empty Tree\n");
+
+    else printf("%d\n", depth); 
 }
