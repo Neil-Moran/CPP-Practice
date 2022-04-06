@@ -29,7 +29,7 @@ int main()
 void addFromFile(LinkedList &list, char *filename)
 {
     FILE *file;
-    file = fopen(filename, "r");
+    fopen_s(&file, filename, "r");
     
     // The first value in the file indicates the number of values
     int numValues;
@@ -46,7 +46,7 @@ void addFromFile(LinkedList &list, char *filename)
 void insertFromFile(LinkedList &list, char *filename)
 {
     FILE *file;
-    file = fopen(filename, "r");
+    fopen_s(&file, filename, "r");
     
     // The first value in the file indicates the number of values
     int numValues;
