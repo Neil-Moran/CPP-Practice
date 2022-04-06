@@ -1,5 +1,6 @@
 #pragma once
 #include "BinaryTree.h"
+#include <stdio.h>
 
 Node::Node(int v)
 {
@@ -22,7 +23,15 @@ void Node::add(Node *n)
             this->right = n;
         else this->right->add(n);
     }
+};
 
+void Node::printRecursive()
+{
+    if(left != 0)
+        left->printRecursive();
+    printf("%d ", value);
+    if(right != 0)
+        right->printRecursive();
 };
 
 void BinaryTree::add(Node *n)
@@ -34,5 +43,12 @@ void BinaryTree::add(Node *n)
     }
 
     root->add(n);
+};
 
+void BinaryTree::print()
+{
+    if(root == 0)
+        printf("EMPTY TREE");
+    else root->printRecursive();
+    printf("\n");
 };

@@ -6,7 +6,10 @@ void addFromFile(BinaryTree &tree, char *filename);
 int main()
 {
     BinaryTree tree;
+    tree.print(); //EMPTY TREE
+
     addFromFile(tree, "scrambledNumbers.txt");
+    tree.print(); //1-20
 
     return 0;
 }
