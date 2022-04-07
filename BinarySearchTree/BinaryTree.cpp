@@ -16,30 +16,31 @@ int Node::getValue()
 
 void Node::add(Node *n)
 {
-    if(n->value < this->value)
+    if(n->value < value)
     {
-        if(this->left == 0)
-            this->left = n;
-        else this->left->add(n);
+        if(left == 0)
+            left = n;
+        else left->add(n);
     }
     else
     {
-        if(this->right == 0)
-            this->right = n;
-        else this->right->add(n);
+        if(right == 0)
+            right = n;
+        else right->add(n);
     }
 };
 
-int Node::findRecursive(int target, int depth)
+int Node::findRecursive(int target, int depth = 0)
 {
-    int result = depth + 1;
-
     if(target == value) //found!
-        return result;
+        return depth;
+        
+    ++depth;
+
     if(target < value && left != 0)
-        return left->findRecursive(target, result);
+        return left->findRecursive(target, depth);
     if(right != 0) //we now know target > value
-        return right->findRecursive(target, result);
+        return right->findRecursive(target, depth);
     return -1; //not found
 };
 
@@ -47,14 +48,15 @@ int Node::calcDepthRecursive(int currentDepth = 0)
 {   
     if(left == 0 && right == 0)
         return currentDepth;
-
-    int leftDepth = -1;
-    int rightDepth = -1;
+    
+    ++currentDepth;
+    int leftDepth = 0;
+    int rightDepth = 0;
 
     if(left != 0)
-        leftDepth = left->calcDepthRecursive(currentDepth + 1);
+        leftDepth = left->calcDepthRecursive(currentDepth);
     if(right != 0)
-        rightDepth = right->calcDepthRecursive(currentDepth + 1);
+        rightDepth = right->calcDepthRecursive(currentDepth);
     
     if(leftDepth > rightDepth)
         return leftDepth;
@@ -79,11 +81,13 @@ void Node::printTree(int depth = 0)
     if(depth != 0)
         printf("\\->");
 
+    ++depth;
+
     printf("%d\n", value);
     if(right != 0)
-        right->printTree(depth+1);
+        right->printTree(depth);
     if(left != 0)
-        left->printTree(depth+1);
+        left->printTree(depth);
 };
 
 void BinaryTree::add(Node *n)
@@ -105,7 +109,7 @@ void BinaryTree::find(int target)
         return;
     }
 
-    int result = root->findRecursive(target, -1);
+    int result = root->findRecursive(target);
 
     if(result == -1)
         printf("Value: %d not found\n", target);
