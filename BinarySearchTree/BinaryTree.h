@@ -1,7 +1,9 @@
+#pragma once
+
 struct Node
 {
     friend struct BinaryTree;
-    
+
     Node(int v);
 
     private:
