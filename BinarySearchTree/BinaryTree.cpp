@@ -9,6 +9,11 @@ Node::Node(int v)
     right = 0;
 };
 
+int Node::getValue()
+{
+    return value;
+};
+
 void Node::add(Node *n)
 {
     if(n->value < this->value)

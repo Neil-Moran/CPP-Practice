@@ -1,10 +1,14 @@
 struct Node
 {
-    int value;
-    Node *left, *right;
-
+    friend struct BinaryTree;
+    
     Node(int v);
 
+    private:
+    int value;  
+    Node *left, *right;
+
+    int getValue();
     void add(Node *n);
     int findRecursive(int target, int depth);
     int calcDepthRecursive(int currentDepth);
