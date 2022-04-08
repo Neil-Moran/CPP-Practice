@@ -109,6 +109,47 @@ struct LinkedList
                 return NULL;
         }
     }
+
+    void remove(int value)
+    {
+        if(head == 0) //empty list
+            return;
+
+        Node *curr = head;
+
+        if(curr->value == value) //remove head
+        {
+            head = curr->next;
+            curr->next = 0;
+            delete curr;
+            return;
+        }
+
+        Node *prev = curr;
+        curr = curr-> next;
+
+        while(curr != tail)
+        {
+            if(curr->value == value)
+            {
+                prev->next = curr->next;
+                curr->next = 0;
+                delete curr;
+                return;
+            }
+
+            prev = curr;
+            curr = curr-> next;
+        }
+
+        if(curr->value == value) //remove tail (curr = tail)
+        {
+            tail = prev;
+            prev->next = 0;                
+            curr->next = 0;
+            delete curr;
+        }
+    }
     
     void reverse()
     {

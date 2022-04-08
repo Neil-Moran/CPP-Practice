@@ -26,6 +26,12 @@ int main()
         find(listOrdered, 6);   // found
         find(listOrdered, 15);  // found
         find(listOrdered, 21);  // not found
+
+        listOrdered.remove(20); // remove head
+        listOrdered.remove(16); // remove node 16
+        listOrdered.remove(1);  // remove tail
+        listOrdered.remove(50); // not in list, do nothing
+        listOrdered.print();    // list with values removed
     }
 
     return 0;
