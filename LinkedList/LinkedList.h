@@ -95,6 +95,21 @@ struct LinkedList
         n->next = curr;
     }
 
+    Node* find(int value)
+    {
+        if(head == 0) //empty list
+            return NULL;
+
+        for(Node *curr = head; ; curr = curr->next)
+        {
+            if(curr->value == value)
+                return curr;
+
+            if(curr == tail)
+                return NULL;
+        }
+    }
+    
     void reverse()
     {
         Node *prev = 0;

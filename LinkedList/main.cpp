@@ -3,6 +3,7 @@
 
 void addFromFile(LinkedList &list, char *filename);
 void insertFromFile(LinkedList &list, char *filename);
+void find(LinkedList &list, int value);
 
 int main() 
 {
@@ -21,6 +22,10 @@ int main()
 
         listOrdered.reverse();
         listOrdered.print(); // reversed list of 20-1
+
+        find(listOrdered, 6);   // found
+        find(listOrdered, 15);  // found
+        find(listOrdered, 21);  // not found
     }
 
     return 0;
@@ -58,4 +63,14 @@ void insertFromFile(LinkedList &list, char *filename)
         fscanf_s(file, "%d", &v);
         list.insert(new Node(v));
     }
+}
+
+void find(LinkedList &list, int value)
+{
+    Node *n = list.find(value);
+
+    if(n == 0)
+        printf("Value: %d not found\n", value);
+
+    else printf("Value: %d found\n", n->value);
 }
