@@ -8,6 +8,15 @@ Node::Node(int v)
     right = 0;
 };
 
+Node::~Node()
+{
+    if(left != 0)
+        delete left;
+    if(right != 0)
+        delete right;
+    printf("Destroying Node: %d\n", value);
+};
+
 int Node::getValue()
 {
     return value;
@@ -113,6 +122,72 @@ void BinaryTree::find(int target)
     if(result == -1)
         printf("Value: %d not found\n", target);
     else printf("Value: %d found. Depth: %d\n", target, result);
+};
+
+void BinaryTree::remove(int value)
+{
+    if(root == 0)
+        return;    
+
+    if(root->value == value) //remove root
+    {
+        //make right new root and add left to it (could also do vice versa)
+        Node *rootNew = root->right;
+        rootNew->add(root->left);
+
+        //disconnect and delete root
+        root->left = 0;
+        root->right = 0;
+        delete root;
+
+        //assign new root
+        root = rootNew;
+        return;
+    }
+
+    Node *curr = root;
+    Node *parent = 0;
+
+    while(true)
+    {
+        if(value < curr->value)
+        {
+            if(curr->left == 0) //not found
+                return;
+            //keep looking
+            parent = curr;
+            curr = curr->left;
+        }
+
+        if(value > curr->value)
+        {
+            if(curr->right == 0) //not found
+                return;
+            //keep looking
+            parent = curr;
+            curr = curr->right;
+        }
+        
+        if(curr->value == value) //found
+        {
+            //disconnect curr from parent
+            if(curr == parent->left)
+                parent->left = 0;
+            if(curr == parent->right)
+                parent->right = 0;
+                
+            //add both children to parent, order doesn't matter
+            parent->add(curr->right);
+            parent->add(curr->left);
+
+            //disconnect and delete curr
+            curr->right = 0;
+            curr->left = 0;
+            delete curr;
+            return;
+        }
+
+    }
 };
 
 int BinaryTree::calcDepth()

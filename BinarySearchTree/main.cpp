@@ -10,6 +10,7 @@ int main()
     tree.print();       //EMPTY TREE
     tree.find(14);      //empty tree, not found
     printDepth(tree);   //empty
+    printf("//////////\n");
 
     addFromFile(tree, "scrambledNumbers.txt");
     tree.print();       //1-20
@@ -19,6 +20,13 @@ int main()
     tree.find(14);  //found
     tree.find(4);   //found, root
     tree.find(21);  //not found
+    printf("//////////\n");
+
+    tree.remove(4);     //remove root
+    tree.remove(15);    //remove middle node
+    tree.remove(21);    //not in tree, do nothing
+    tree.print();
+    tree.printAsTree();
 
     return 0;
 }
