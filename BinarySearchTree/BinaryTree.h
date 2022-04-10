@@ -27,6 +27,7 @@ struct BinaryTree
     void find(int target);
     void remove(int value);
     int calcDepth();
+    void balance();
     void print();
     void printAsTree();
 };

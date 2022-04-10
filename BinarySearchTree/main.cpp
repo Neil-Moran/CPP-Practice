@@ -27,6 +27,11 @@ int main()
     tree.remove(21);    //not in tree, do nothing
     tree.print();
     tree.printAsTree();
+    printf("//////////\n");
+
+    tree.balance();
+    tree.printAsTree();
+    printDepth(tree);
 
     return 0;
 }

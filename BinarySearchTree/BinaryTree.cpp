@@ -127,7 +127,7 @@ void BinaryTree::find(int target)
 void BinaryTree::remove(int value)
 {
     if(root == 0)
-        return;    
+        return;
 
     if(root->value == value) //remove root
     {
@@ -175,7 +175,7 @@ void BinaryTree::remove(int value)
                 parent->left = 0;
             if(curr == parent->right)
                 parent->right = 0;
-                
+
             //add both children to parent, order doesn't matter
             parent->add(curr->right);
             parent->add(curr->left);
@@ -186,7 +186,6 @@ void BinaryTree::remove(int value)
             delete curr;
             return;
         }
-
     }
 };
 
@@ -195,6 +194,46 @@ int BinaryTree::calcDepth()
     if(root == 0)
         return -1;
     return root->calcDepthRecursive();
+};
+
+void BinaryTree::balance()
+{
+    //Rudimentary balancing algorithm - if root's 
+    //left and right branch are not the same depth
+    //(or 1 away), make the bigger one the new root
+    //and add the smaller one to it.
+    //Does not balance the sub branches!
+
+    int depthL, depthR;
+
+    while(true)
+    {
+        if(root->left != 0) 
+            depthL = root->left->calcDepthRecursive(); 
+        else depthL = 0;
+
+        if(root->right != 0) 
+            depthR = root->right->calcDepthRecursive();
+        else depthR = 0;
+
+        if(depthL - depthR > 1) //left branch is too deep
+        {
+            Node *rootNew = root->left;
+            root->left = 0;
+            rootNew->add(root);
+            root = rootNew;
+        }
+
+        else if(depthR - depthL > 1) //right branch is too deep
+        {
+            Node *rootNew = root->right;
+            root->right = 0;
+            rootNew->add(root);
+            root = rootNew;
+        }
+
+        else return; //balanced
+    }
 };
 
 void BinaryTree::print()
