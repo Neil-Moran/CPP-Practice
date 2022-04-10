@@ -148,27 +148,21 @@ void BinaryTree::remove(int value)
     Node *curr = root;
     Node *parent = 0;
 
-    while(true)
+    while(curr != 0)
     {
         if(value < curr->value)
-        {
-            if(curr->left == 0) //not found
-                return;
-            //keep looking
+        {            
             parent = curr;
             curr = curr->left;
         }
 
-        if(value > curr->value)
+        else if(value > curr->value)
         {
-            if(curr->right == 0) //not found
-                return;
-            //keep looking
             parent = curr;
             curr = curr->right;
         }
         
-        if(curr->value == value) //found
+        else //we now know (curr->value == value) => found
         {
             //disconnect curr from parent
             if(curr == parent->left)
@@ -184,7 +178,7 @@ void BinaryTree::remove(int value)
             curr->right = 0;
             curr->left = 0;
             delete curr;
-            return;
+            curr = 0;
         }
     }
 };
