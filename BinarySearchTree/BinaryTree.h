@@ -24,6 +24,8 @@ struct BinaryTree
 {
     Node *root = 0;
 
+    ~BinaryTree();
+
     void add(Node *n);
     void find(int target);
     void remove(int value);

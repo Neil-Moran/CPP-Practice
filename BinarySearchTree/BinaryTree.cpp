@@ -146,6 +146,11 @@ void Node::printTree(int depth = 0)
         left->printTree(depth);
 };
 
+BinaryTree::~BinaryTree()
+{
+    delete root;
+}
+
 void BinaryTree::add(Node *n)
 {
     if(root == 0) //empty tree
