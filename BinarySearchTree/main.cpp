@@ -9,13 +9,13 @@ int main()
     BinaryTree tree;
     tree.print();       //EMPTY TREE
     tree.find(14);      //empty tree, not found
-    printDepth(tree);   //empty
+    printDepth(tree);
     printf("//////////\n");
 
     addFromFile(tree, "scrambledNumbers.txt");
     tree.print();       //1-20
-    tree.printAsTree(); //print tree structure
-    printDepth(tree);   //depth: 6
+    tree.printAsTree();
+    printDepth(tree);
 
     tree.find(14);  //found
     tree.find(4);   //found, root
