@@ -15,7 +15,7 @@ struct Node
     void add(Node *n);
     int findRecursive(int target, int depth);
     int calcDepthRecursive(int currentDepth);
-    void balanceRecursive(Node *parent);
+    Node* balanceRecursive(Node *parent);
     void printRecursive();
     void printTree(int depth);
 };

@@ -72,11 +72,16 @@ int Node::calcDepthRecursive(int currentDepth = 0)
     else return rightDepth;
 };
 
-void Node::balanceRecursive(Node *parent)
+Node* Node::balanceRecursive(Node *parent)
 {
+    //returns a pointer to the new root node, or 0 if on a child branch
     printf("%d ", value);
     int depthL, depthR;
     Node *curr = 0;
+    Node *root = 0;
+
+    if(parent == 0)
+        root = this;
 
     while(true)
     {
@@ -96,20 +101,27 @@ void Node::balanceRecursive(Node *parent)
             curr = left;
             left = 0;            
         }
-
         else //(depthR > depthL) => right branch is too deep
         {
             curr = right;
             right = 0;
         }
-
-        //connect parent to curr instead of this
-        if(parent->left == this)
-            parent->left = curr;
-        else parent->right = curr;
+        
+        if(parent == 0) //assign new root
+        {
+            root = curr;
+        }
+        else //connect parent to curr instead of this
+        {
+            if(parent->left == this)
+                parent->left = curr;
+            else parent->right = curr;
+        }
 
         curr->add(this);
-        curr->balanceRecursive(parent);
+        Node * newRoot = curr->balanceRecursive(parent);
+        if(newRoot != 0)
+            root = newRoot;
     }
 
     //balance children
@@ -117,6 +129,8 @@ void Node::balanceRecursive(Node *parent)
         left->balanceRecursive(this);
     if(right != 0) 
         right->balanceRecursive(this);
+
+    return root;
 }
 
 void Node::printRecursive()
@@ -246,45 +260,7 @@ int BinaryTree::calcDepth()
 void BinaryTree::balance()
 {   
     printf("BALANCING: ");
-    //balance root's branches
-    int depthL, depthR;
-    Node *rootNew = 0;
-
-    while(true)
-    {
-        if(root->left != 0) 
-            depthL = root->left->calcDepthRecursive(); 
-        else depthL = -1;
-
-        if(root->right != 0) 
-            depthR = root->right->calcDepthRecursive();
-        else depthR = -1;
-
-        if(abs(depthL - depthR) <= 1) //balanced
-            break;
-        
-        if(depthL > depthR) //left branch is too deep
-        {
-            rootNew = root->left;
-            root->left = 0;
-        }
-
-        else //if(depthR > depthL) => right branch is too deep
-        {
-            rootNew = root->right;
-            root->right = 0;
-        }
-
-        //add old root to new root
-        rootNew->add(root);
-        root = rootNew;
-    }
-
-    //balance children
-    if(root->left != 0) 
-        root->left->balanceRecursive(root);
-    if(root->right != 0) 
-        root->right->balanceRecursive(root);
+    root = root->balanceRecursive(0);
     printf("\n");
 };
 
