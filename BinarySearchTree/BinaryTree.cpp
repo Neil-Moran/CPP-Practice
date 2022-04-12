@@ -1,4 +1,5 @@
 #include "BinaryTree.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -76,25 +77,27 @@ Node* Node::balanceRecursive(Node *parent)
 {
     //returns a pointer to the new root node, or 0 if on a child branch
     printf("%d ", value);
-    int depthL, depthR;
-    Node *curr = 0;
+    
     Node *root = 0;
-
+    
     if(parent == 0)
         root = this;
 
     while(true)
     {
+        int depthL = 0, depthR = 0;
+
         if(left != 0) 
-            depthL = left->calcDepthRecursive(); 
-        else depthL = 0;
+            depthL = left->calcDepthRecursive();         
 
         if(right != 0) 
-            depthR = right->calcDepthRecursive();
-        else depthR = 0;
+            depthR = right->calcDepthRecursive();        
 
         if(abs(depthL - depthR) <= 1) //balanced
             break;
+        
+        //Node needs to be balanced!
+        Node *curr = 0;
 
         if(depthL > depthR) //left branch is too deep
         {
@@ -107,19 +110,21 @@ Node* Node::balanceRecursive(Node *parent)
             right = 0;
         }
         
-        if(parent == 0) //assign new root
+        if(root == this) //this node was the root, so assign new root
         {
             root = curr;
         }
         else //connect parent to curr instead of this
         {
-            if(parent->left == this)
+            if(this == parent->left)
                 parent->left = curr;
-            else parent->right = curr;
+            else if(this == parent->right)
+                parent->right = curr;
+            else assert(false); //parent pointer incorrectly assigned!
         }
 
-        curr->add(this);
-        Node * newRoot = curr->balanceRecursive(parent);
+        curr->add(this); //add this node to its new parent
+        Node *newRoot = curr->balanceRecursive(parent);
         if(newRoot != 0)
             root = newRoot;
     }

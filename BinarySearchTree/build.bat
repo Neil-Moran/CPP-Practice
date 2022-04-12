@@ -1,8 +1,8 @@
 @echo off
 
-set COMMON_COMPILER_FLAGS=/nologo /EHa- /GR- /fp:fast /Oi /W4 /Fm
+set COMMON_COMPILER_FLAGS=/nologo /EHa- /GR- /fp:fast /Oi /W4 /Fm /FC
 
-set DEBUG_FLAGS=/DDEBUG_BUILD /Od /MTd /Zi
+set DEBUG_FLAGS=/DDEBUG_BUILD /Od /MDd /Zi
 set RELEASE_FLAGS =/O2
 
 set COMPILER_FLAGS=%COMMON_COMPILER_FLAGS% %DEBUG_FLAGS%
