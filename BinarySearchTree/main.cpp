@@ -59,7 +59,7 @@ void printDepth(BinaryTree &tree)
 
     int depth = tree.calcDepth();
 
-    if (depth == -1)
+    if (depth == 0)
         printf("Empty Tree\n");
 
     else printf("%d\n", depth); 

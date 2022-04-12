@@ -39,7 +39,7 @@ void Node::add(Node *n)
     }
 };
 
-int Node::findRecursive(int target, int depth = 0)
+int Node::findRecursive(int target, int depth = 1)
 {
     if(target == value) //found!
         return depth;
@@ -50,10 +50,10 @@ int Node::findRecursive(int target, int depth = 0)
         return left->findRecursive(target, depth);
     if(right != 0) //we now know target > value
         return right->findRecursive(target, depth);
-    return -1; //not found
+    return 0; //not found
 };
 
-int Node::calcDepthRecursive(int currentDepth = 0)
+int Node::calcDepthRecursive(int currentDepth = 1)
 {   
     if(left == 0 && right == 0)
         return currentDepth;
@@ -87,11 +87,11 @@ Node* Node::balanceRecursive(Node *parent)
     {
         if(left != 0) 
             depthL = left->calcDepthRecursive(); 
-        else depthL = -1;
+        else depthL = 0;
 
         if(right != 0) 
             depthR = right->calcDepthRecursive();
-        else depthR = -1;
+        else depthR = 0;
 
         if(abs(depthL - depthR) <= 1) //balanced
             break;
@@ -186,7 +186,7 @@ void BinaryTree::find(int target)
 
     int result = root->findRecursive(target);
 
-    if(result == -1)
+    if(result == 0)
         printf("Value: %d not found\n", target);
     else printf("Value: %d found. Depth: %d\n", target, result);
 };
@@ -253,7 +253,7 @@ void BinaryTree::remove(int value)
 int BinaryTree::calcDepth()
 {   
     if(root == 0)
-        return -1;
+        return 0;
     return root->calcDepthRecursive();
 };
 
