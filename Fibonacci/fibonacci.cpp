@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <chrono>
 
 void printFibonacci(int n)
 {
@@ -61,4 +62,29 @@ void printFibonacciTerm(int n)
 {
     if(n>76) printf("Cannot print Fibonacci terms above #76, they're too big. Sorry!\n");
     else printf("Printing Fibonacci term #%d: %I64d\n", n, calcFibonacciTerm(n));
+}
+
+void compareFibonacciPerf(int n) //measures and compares time taken to calculate nth term by both algorithms
+{
+    printf("Calculating Fibonacci term #%d\n", n);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    unsigned long long result = calcFibonacciTerm(n);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed_nonRec = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    
+    printf("Non-recursive: %I64d ", result);    
+    printf("(%.8f seconds)\n", elapsed_nonRec.count() * 1e-9);
+
+    start = std::chrono::high_resolution_clock::now();
+    result = calcFibonacciTermRecursive(n);
+    end = std::chrono::high_resolution_clock::now();
+    auto elapsed_Rec = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    
+    printf("Recursive: %I64d ", result);    
+    printf("(%.8f seconds)\n", elapsed_Rec.count() * 1e-9);
+
+    double ratio = (double)(elapsed_Rec.count() / elapsed_nonRec.count());
+    printf("Non-recursive was %.0fx faster\n", ratio);
+    printf("\n");
 }

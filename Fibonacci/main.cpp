@@ -12,7 +12,7 @@ int main()
     printFibonacciTermRecursive(0);
     printFibonacciTermRecursive(1);
     printFibonacciTermRecursive(30);
-    printFibonacciTermRecursive(50);
+    //printFibonacciTermRecursive(50); //this takes over a minute!
     printFibonacciTermRecursive(77);
     printf("\n");
 
@@ -23,6 +23,12 @@ int main()
     printFibonacciTerm(76);
     printFibonacciTerm(77);
     printf("\n");
+
+    compareFibonacciPerf(10);
+    compareFibonacciPerf(20);
+    compareFibonacciPerf(30);
+    compareFibonacciPerf(40);
+    //compareFibonacciPerf(50); //this takes over a minute!
 
     return 0;
 }
