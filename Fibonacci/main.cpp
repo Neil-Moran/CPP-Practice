@@ -13,15 +13,16 @@ int main()
     printFibonacciTermRecursive(1);
     printFibonacciTermRecursive(30);
     //printFibonacciTermRecursive(50); //this takes over a minute!
-    printFibonacciTermRecursive(77);
+    printFibonacciTermRecursive(93);
     printf("\n");
 
     printFibonacciTerm(0);
     printFibonacciTerm(1);
     printFibonacciTerm(30);
     printFibonacciTerm(50);
-    printFibonacciTerm(76);
-    printFibonacciTerm(77);
+    printFibonacciTerm(80);
+    printFibonacciTerm(92);
+    printFibonacciTerm(93);
     printf("\n");
 
     compareFibonacciPerf(10);
@@ -29,6 +30,9 @@ int main()
     compareFibonacciPerf(30);
     compareFibonacciPerf(40);
     //compareFibonacciPerf(50); //this takes over a minute!
+
+    writeFibonacci(10, "fibonacci10.txt");
+    writeFibonacci(100, "fibonacci100.txt");
 
     return 0;
 }

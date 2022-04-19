@@ -14,19 +14,55 @@ void printFibonacci(int n)
 
     printf("0 ");
 
-    int prev = 0;
-    int curr = 1; 
+    unsigned long long prev = 0;
+    unsigned long long curr = 1;
 
-    for(int i=1; i<n; ++i) //i=1 as we've already printed 1 term above
+    for(int i=1; i<n && i<93; ++i) //i=1 as we've already printed 1 term above
     {
-        printf("%d ", curr);
+        printf("%I64d ", curr);
 
-        int next = prev + curr;
+        unsigned long long next = prev + curr;
         prev = curr;
         curr = next;
     }
 
+    if(n>93) //terms above f(92) won't fit in unsigned long long
+        printf("\nCannot print Fibonacci terms above f(92), they're too big. Sorry!\n");
+
     printf("\n");
+}
+
+void writeFibonacci(int n, char *filename) 
+{
+    //writes the first n Fibonacci terms to the specified file
+    //creates the file if it doesn't exist
+    //first empties the file if it does exist
+
+    FILE *file;
+
+    fopen_s(&file, filename, "w+"); 
+    fprintf(file, "Writing %d terms of Fibonacci series: ", n);    
+
+    if(n == 0) return;
+
+    fprintf(file, "0 ");
+
+    unsigned long long prev = 0;
+    unsigned long long curr = 1;    
+
+    for(int i=1; i<n && i<93; ++i) //i=1 as we've already printed 1 term above
+    {
+        fprintf(file, "%I64d ", curr);
+
+        unsigned long long next = prev + curr;
+        prev = curr;
+        curr = next;
+    }
+
+    if(n>93) //terms above f(92) won't fit in unsigned long long
+        fprintf(file, "\nCannot print Fibonacci terms above f(92), they're too big. Sorry!");
+
+    fclose(file);
 }
 
 unsigned long long calcFibonacciTermRecursive(int n) //saw this algorithm online and it looked fun, but it's extremely slow!
@@ -38,7 +74,7 @@ unsigned long long calcFibonacciTermRecursive(int n) //saw this algorithm online
 
 void printFibonacciTermRecursive(int n)
 {
-    if(n>76) printf("Cannot print Fibonacci terms above #76, they're too big. Sorry!\n");
+    if(n>92) printf("Cannot print Fibonacci terms above f(92), they're too big. Sorry!\n");
     else printf("Printing Fibonacci term #%d recursively: %I64d\n", n, calcFibonacciTermRecursive(n));
 }
 
@@ -60,7 +96,7 @@ unsigned long long calcFibonacciTerm(int n)
 
 void printFibonacciTerm(int n)
 {
-    if(n>76) printf("Cannot print Fibonacci terms above #76, they're too big. Sorry!\n");
+    if(n>92) printf("Cannot print Fibonacci terms above f(92), they're too big. Sorry!\n");
     else printf("Printing Fibonacci term #%d: %I64d\n", n, calcFibonacciTerm(n));
 }
 
