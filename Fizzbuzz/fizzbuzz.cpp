@@ -17,3 +17,20 @@ void fizzbuzz(int n) //print the first n terms of fizzbuzz
     }
     printf("\n");
 }
+
+void fizzbuzz(int n, char *filename) //write the first n terms of fizzbuzz to the specified file
+{
+    FILE *file;
+    fopen_s(&file, filename, "w+"); 
+
+    for(int i=1; i<=n; ++i)
+    {
+        if(i%fizz == 0)
+            fprintf(file, "Fizz");
+        if(i%buzz == 0)
+            fprintf(file, "Buzz");
+        else if(i%fizz != 0)
+            fprintf(file, "%d", i);
+        fprintf(file, " ");
+    }
+}
