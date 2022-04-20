@@ -8,4 +8,7 @@ void main()
     fizzbuzz(100, "fizzbuzz100.txt");
 
     fizzbuzzNoModulo(30);
+
+    profileFizzbuzz();
+    profileFizzbuzzNoModulo();
 }

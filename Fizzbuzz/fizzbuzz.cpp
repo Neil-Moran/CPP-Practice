@@ -1,7 +1,9 @@
+#include <assert.h>
+#include <chrono>
 #include <stdio.h>
 
-int fizz = 3;
-int buzz = 5;
+const int fizz = 3;
+const int buzz = 5;
 
 void fizzbuzz(int n) //print the first n terms of fizzbuzz
 {
@@ -33,6 +35,21 @@ void fizzbuzz(int n, char *filename) //write the first n terms of fizzbuzz to th
             fprintf(file, "%d", i);
         fprintf(file, " ");
     }
+    fclose(file);
+}
+
+void profileFizzbuzz() //write a large number of terms of fizzbuzz to a file using modulo operator and time it
+{
+    const int n = 1000000;
+    auto start = std::chrono::high_resolution_clock::now();    
+
+    fizzbuzz(n, "profileFizzbuzz.txt");
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+    printf("Wrote %d terms of Fizzbuzz using modulo operator in %.8f seconds\n", n, elapsed.count() * 1e-9);
+    assert(remove("profileFizzbuzz.txt") == 0);
 }
 
 void fizzbuzzNoModulo(int n) //print the first n terms of fizzbuzz without the modulo operator
@@ -85,4 +102,19 @@ void fizzbuzzNoModulo(int n, char *filename) //write the first n terms of fizzbu
         else fizzCount = fizz; //now reset fizz counter
         fprintf(file, " ");        
     }
+    fclose(file);
+}
+
+void profileFizzbuzzNoModulo() //write a large number terms of fizzbuzz to a file without using modulo operator and time it
+{
+    const int n = 1000000;
+    auto start = std::chrono::high_resolution_clock::now();    
+
+    fizzbuzzNoModulo(n, "profileFizzbuzz.txt");
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+    printf("Wrote %d terms of Fizzbuzz without using modulo operator in %.8f seconds\n", n, elapsed.count() * 1e-9);
+    assert(remove("profileFizzbuzz.txt") == 0);
 }
