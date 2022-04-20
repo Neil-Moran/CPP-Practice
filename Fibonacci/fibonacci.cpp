@@ -102,20 +102,22 @@ void printFibonacciTerm(int n)
 
 void compareFibonacciPerf(int n) //measures and compares time taken to calculate nth term by both algorithms
 {
+    using namespace std::chrono;
+
     printf("Calculating Fibonacci term #%d\n", n);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    high_resolution_clock::time_point start = high_resolution_clock::now();
     unsigned long long result = calcFibonacciTerm(n);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed_nonRec = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    high_resolution_clock::time_point end = high_resolution_clock::now();
+    nanoseconds elapsed_nonRec = duration_cast<nanoseconds>(end - start);
     
     printf("Non-recursive: %I64d ", result);    
     printf("(%.8f seconds)\n", elapsed_nonRec.count() * 1e-9);
 
-    start = std::chrono::high_resolution_clock::now();
+    start = high_resolution_clock::now();
     result = calcFibonacciTermRecursive(n);
-    end = std::chrono::high_resolution_clock::now();
-    auto elapsed_Rec = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    end = high_resolution_clock::now();
+    nanoseconds elapsed_Rec = duration_cast<nanoseconds>(end - start);
     
     printf("Recursive: %I64d ", result);    
     printf("(%.8f seconds)\n", elapsed_Rec.count() * 1e-9);
