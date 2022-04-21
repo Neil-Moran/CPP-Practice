@@ -2,5 +2,5 @@
 
 void main()
 {
-    primes(30);
+    primes(1000);
 }
