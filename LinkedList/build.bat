@@ -15,7 +15,7 @@ set BUILD_DIR=".\build"
 if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
 
-cl %COMPILER_FLAGS% ../main.cpp /link %LINKER_FLAGS% %SYSTEM_LIBS%
+cl %COMPILER_FLAGS% ../main.cpp ../LinkedList.cpp /link %LINKER_FLAGS% %SYSTEM_LIBS%
 
 popd
 echo Done
