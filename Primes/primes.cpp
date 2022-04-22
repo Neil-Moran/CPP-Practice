@@ -13,7 +13,7 @@ void primes(const int MAX_LIMIT) //print all primes between 0 and the specified 
     printf("2 "); //print 2 as we know it's the first prime, and this lets us skip all even integers later!
 
     //series denoting the odd integers starting from 3, i.e. f(i)=3+2i. If bit is 1 the integer is prime. We will unset the bits of non-primes using the Sieve of Eratosthenes below
-    int NUM_BUCKETS = MAX_LIMIT/32+1; //the number of 64-bit ints we need is 1+ HALF the maximum limit/64, as we skip all even values!
+    int NUM_BUCKETS = MAX_LIMIT/32 + 1; //the number of 64-bit ints we need is 1 + HALF the maximum limit/64, as we skip all even values!
     uint64_t *primeList = new uint64_t[NUM_BUCKETS];
     int bucketSize = sizeof(*primeList)*8;
 
@@ -22,9 +22,7 @@ void primes(const int MAX_LIMIT) //print all primes between 0 and the specified 
         primeList[i] = 0xFFFFFFFFFFFFFFFFULL;
     }
     
-    int i=0; //start on index 0 which denotes 3, the next prime
-    
-    while(3+(2*i)<=MAX_LIMIT) //loop until we've reached the max limit
+    for(int i=0; i <= (MAX_LIMIT-3)/2; ++i) //loop until we've reached the max limit, i.e. while 3+2i <= MAX_LIMIT
     {
         //figure out which array (and index within that array) i maps to
         int arrayBucket = i/bucketSize;
@@ -43,7 +41,6 @@ void primes(const int MAX_LIMIT) //print all primes between 0 and the specified 
                 primeList[j/bucketSize] &= ~(1ULL << j%bucketSize);
             }
         }
-        ++i; //check if next odd number is prime
     }
     printf("\n");
     delete[] primeList;
