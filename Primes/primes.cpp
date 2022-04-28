@@ -60,3 +60,18 @@ void primes(const int MAX_LIMIT) //print all primes between 0 and the specified 
     TIME_END
     delete[] primeList;
 }
+
+bool isPrime(const uint64_t n)
+{
+    if(n<2) return false;
+    if(n==2) return true;
+    if((n&1) == 0) return false; //check if n is even now, if not we only need to check for odd factors below
+
+    const double SQRT_N = sqrt(n);
+
+    for(int i=3; i<= SQRT_N; i+=2)
+    {
+        if(n%i ==0) return false;
+    }
+    return true;
+}
