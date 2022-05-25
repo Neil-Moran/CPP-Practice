@@ -25,6 +25,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
                 fprintf(file, "%d", saveState);
                 fclose(file);
             }
+            if(wparam == VK_CONTROL) //load save state from file
+            {
+                FILE *file;
+                fopen_s(&file, "saveState.txt", "r");
+                fscanf_s(file, "%d", &saveState);
+                fclose(file);
+            }
             break;
         }
         case WM_DESTROY:
