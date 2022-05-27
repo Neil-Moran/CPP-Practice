@@ -16,8 +16,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         {
             if(wparam == VK_ESCAPE)
                 DestroyWindow(hwnd);
-            if(wparam >= 0x41 && wparam <= 0x5A) //between a and z
-                saveState ^= (1 << (wparam - 0x41)); //invert bit corresponding to pressed key
+            if(wparam >= 'A' && wparam <= 'Z') //between a and z
+                saveState ^= (1 << (wparam - 'A')); //invert bit corresponding to pressed key
             if(wparam == VK_SPACE) //write save state to file
             {
                 FILE *file;
