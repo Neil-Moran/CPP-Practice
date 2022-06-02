@@ -19,5 +19,9 @@ int main()
     quickSort(array, 30);
     }
 
+    profileBubbleSort();
+    profileMergeSort();
+    profileQuickSort();
+
     return 0;
 }
