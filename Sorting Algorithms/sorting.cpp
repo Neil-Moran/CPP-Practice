@@ -13,7 +13,9 @@ void print(int array[], int size)
 }
 
 void bubbleSort(int array[], int size)
-{       
+{
+    if(size <= 0) return;
+
     printf("Bubble Sort: ");
     bool sorted = false;
 
@@ -113,6 +115,57 @@ void mergeSort(int array[], int size)
     printf("Merge Sort: ");
     
     mergeSort(array, 0, size-1);
+
+    print(array, size);
+}
+
+int partition(int array[], int low, int high)
+{
+    int pivot = array[high]; //select the right-most element as a pivot (arbitrary)
+    int pi = low; // will be the partition index, the index where the pivot belongs
+
+    //find the correct index for the pivot
+    for(int i=low; i<high; ++i)
+    {
+        if(array[i]<=pivot)
+        {
+            if(i!=pi)
+            {
+                int temp = array[pi];
+                array[pi] = array[i];
+                array[i] = temp;
+            }
+            ++pi;
+        }
+    }
+
+    if(pi != high) //move the pivot to the correct index, if not already there
+    {
+        int temp = array[pi];
+        array[pi] = array[high];
+        array[high] = temp;
+    }
+    return pi;
+}
+
+void quickSort(int array[], int low, int high)
+{
+    if(low < high)
+    {
+        int pivot = partition(array, low, high);
+        
+        quickSort(array, low, pivot-1);
+        quickSort(array, pivot+1, high);
+    }
+}
+
+void quickSort(int array[], int size)
+{
+    if(size <= 0) return;
+
+    printf("Quick Sort: ");
+    
+    quickSort(array, 0, size-1);
 
     print(array, size);
 }
