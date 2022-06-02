@@ -39,15 +39,14 @@ void bubbleSort(int array[], int size)
 }
 
 void merge(int array[], int l, int mid, int r) //assuming array is sorted from l->mid & mid+1->r, merge those two sub arrays
-{
-     
+{     
     int *arrayTemp = (int*)malloc(sizeof(int)*(r-l+1));
 
     int i=0;
     int i_l = l;
     int i_r = mid+1;  
     
-    while(i<=r-l && i_l <= mid && i_r <= r)
+    while(i_l <= mid && i_r <= r)
     {
         if(array[i_l] < array[i_r])
         {
@@ -63,7 +62,7 @@ void merge(int array[], int l, int mid, int r) //assuming array is sorted from l
         ++i;
     }
 
-    if(i_l <= mid)
+    if(i_l <= mid) //finish reading all the values from the left sub array into the temp array
     {
         for(int j=i_l; j<=mid; ++j)
         {
@@ -71,17 +70,14 @@ void merge(int array[], int l, int mid, int r) //assuming array is sorted from l
             ++i;
         }
     }
-
-    if(i_r <= r)
-    {
-        for(int j=i_r; j<=r; ++j)
-        {
-            arrayTemp[i] = array[j];
-            ++i;
-        }
-    }
     
-    for(i=0; i<=r-l; ++i)
+    // if we haven't finished reading all the values from the right sub array into
+    // the temp array then we don't need to bother - they're already in the correct
+    // position in the result array! Set the temp_end variable to denote at what index 
+    // we should stop reading results from the temp array
+    int temp_end = (i_r <= r) ? i_r-l-1 : r-l;
+    
+    for(i=0; i<=temp_end; ++i)
         array[l+i] = arrayTemp[i];
 
     free(arrayTemp);
