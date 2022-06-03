@@ -57,6 +57,45 @@ void profileBubbleSort()
     TIME_END
 }
 
+inline void selectionSortPrivate(int array[], int size)
+{
+    for(int sortedIndex = 0; sortedIndex < size; ++sortedIndex) //everything before sorted index in array is sorted
+    {
+        //find the min value in the unsorted sub array...
+        int minValueIndex = sortedIndex;
+        for(int i=sortedIndex; i<size; ++i)
+        {
+            if(array[i] < array[minValueIndex])
+                minValueIndex = i;            
+        }
+
+        //...and move it to the end of the sorted sub array
+        int temp = array[minValueIndex];
+        array[minValueIndex] = array[sortedIndex];
+        array[sortedIndex] = temp;
+    }
+}
+
+void selectionSort(int array[], int size)
+{
+    if(size <= 0) return;
+
+    printf("Selection Sort: ");
+    
+    selectionSortPrivate(array, size);
+
+    print(array, size);
+}
+
+void profileSelectionSort()
+{
+    BIG_ARRAY
+    printf("Profiling Selection Sort\n");
+    TIME_START
+    selectionSortPrivate(array, 10000);
+    TIME_END
+}
+
 void merge(int array[], int l, int mid, int r) //assuming array is sorted from l->mid & mid+1->r, merge those two sub arrays
 {     
     int *arrayTemp = (int*)malloc(sizeof(int)*(r-l+1));
@@ -202,44 +241,5 @@ void profileQuickSort()
     printf("Profiling Quick Sort\n");
     TIME_START
     quickSort(array, 0, 10000-1);
-    TIME_END
-}
-
-void selectionSortPrivate(int array[], int size)
-{
-    for(int sortedIndex = 0; sortedIndex < size; ++sortedIndex) //everything before sorted index in array is sorted
-    {
-        //find the min value in the unsorted sub array...
-        int minValueIndex = sortedIndex;
-        for(int i=sortedIndex; i<size; ++i)
-        {
-            if(array[i] < array[minValueIndex])
-                minValueIndex = i;            
-        }
-
-        //...and move it to the end of the sorted sub array
-        int temp = array[minValueIndex];
-        array[minValueIndex] = array[sortedIndex];
-        array[sortedIndex] = temp;
-    }
-}
-
-void selectionSort(int array[], int size)
-{
-    if(size <= 0) return;
-
-    printf("Selection Sort: ");
-    
-    selectionSortPrivate(array, size);
-
-    print(array, size);
-}
-
-void profileSelectionSort()
-{
-    BIG_ARRAY
-    printf("Profiling Selection Sort\n");
-    TIME_START
-    selectionSortPrivate(array, 10000);
     TIME_END
 }
