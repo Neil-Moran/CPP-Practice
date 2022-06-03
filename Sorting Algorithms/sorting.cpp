@@ -16,24 +16,24 @@ void print(int array[], int size)
 
 inline void bubbleSortPrivate(int array[], int size)
 {
-    bool sorted = false;
+    bool sorted = false;     
 
-    while(!sorted)
+    for(int sortedIndex = size-1; !sorted; --sortedIndex) //everything after sorted index in array is sorted
     {
         sorted = true;
         int temp = -999;
 
-        for(int i=0; i<size-1; ++i)
+        for(int i=0; i<sortedIndex; ++i)
         {
             if(array[i] > array[i+1])
             {
                 sorted = false;
                 temp = array[i];
                 array[i] = array[i+1];
-                array[i+1] = temp;
-                //print(array, size); //print each swap, for testing
-            }
-        }
+                array[i+1] = temp;                
+            }            
+        }        
+        //print(array, size); //print each iteration, for testing
     }
 }
 
