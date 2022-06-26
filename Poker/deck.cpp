@@ -77,8 +77,15 @@ void deck::shuffle()
 
 void deck::playHand(int numPlayers)
 {
-    hand player1(this);
-    player1.print();
+    hand *players = new hand[numPlayers];
+
+    for(int i=0; i<numPlayers; ++i)
+    {
+        players[i].drawCards(this);
+        players[i].print();
+    }
+
+    delete[] players;
 }
 
 void deck::print()

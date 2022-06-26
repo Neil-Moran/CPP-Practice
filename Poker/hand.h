@@ -19,8 +19,9 @@ private:
     int cards[5];    
     handResult result;
 
-    hand(deck *deck);
+    hand();
     ~hand();
+    void drawCards(deck *deck);
     void print();
 
     friend class deck;
