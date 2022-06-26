@@ -21,3 +21,14 @@ unsigned int Get1dNoiseUint(int position, unsigned int seed)
     mangledBits ^= (mangledBits >> 8);
     return mangledBits;
 }
+
+bool flipCoin()
+{
+    static int pos = 0;
+
+    double flip = (double)(Get1dNoiseUint(pos, 123456789))/(4294967295); // random value between 0 and 1
+    ++pos;
+
+    if(flip < 0.5) return false;
+    else return true;
+}
