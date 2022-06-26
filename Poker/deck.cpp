@@ -77,11 +77,14 @@ void deck::shuffle()
 
 void deck::playHand(int numPlayers)
 {
+    if(numPlayers > 10) numPlayers = 10;
+    
     hand *players = new hand[numPlayers];
 
     for(int i=0; i<numPlayers; ++i)
     {
         players[i].drawCards(this);
+        printf("Player %i: ", i+1);
         players[i].print();
     }
 

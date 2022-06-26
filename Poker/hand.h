@@ -21,6 +21,8 @@ private:
 
     hand();
     ~hand();
+    int partition(int array[], int low, int high);
+    void quickSort(int array[], int low, int high);
     bool containsCard(int value);
     int containsOnePair();
     void drawCards(deck *deck);
