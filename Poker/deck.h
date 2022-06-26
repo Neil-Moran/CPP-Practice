@@ -8,11 +8,13 @@ private:
     int countCardsDrawn;
 
     std::string getCardValue(int index);
+    void riffleShuffle();
 
 public:
     deck();
     ~deck();
-    void print();
+    void shuffle();
+    void print();    
 };
 
 
