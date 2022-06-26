@@ -1,65 +1,11 @@
 #pragma once
 
+#include "card.h"
 #include "deck.h"
+#include "hand.h"
 #include "squirrel3.h"
 #include <stdio.h>
 #include <string>
-
-std::string getCardValue(int card)
-{
-    std::string currentCard;
-    
-    int value = card%13;
-
-    switch(value)
-    {
-    case 1:
-        currentCard.append("A");
-        break;
-
-    case 11:
-        currentCard.append("J");
-        break;
-
-    case 12:
-        currentCard.append("Q");
-        break;
-
-    case 0:
-        currentCard.append("K");
-        break;
-    
-    default:
-        currentCard.append(std::to_string(value));
-        break;
-    }
-
-    int suit = (card-1)/13;
-
-    switch (suit)
-    {
-    case 0:
-        currentCard.append("C");
-        break;
-
-    case 1:
-        currentCard.append("H");
-        break;
-
-    case 2:
-        currentCard.append("S");
-        break;
-
-    case 3:
-        currentCard.append("D");
-        break;
-    
-    default:
-        break;
-    }
-
-    return currentCard;
-}
 
 deck::deck()
 {   
@@ -144,28 +90,4 @@ void deck::print()
         if((i+1)%13 == 0) result.append("\n");
     }
     printf("%s", result.c_str());
-}
-
-hand::hand(deck *deck)
-{
-    for(int i=0; i<5; ++i)
-    {
-        cards[i] = deck->cards[deck->countCardsDrawn];
-        ++deck->countCardsDrawn;
-    }
-}
-
-hand::~hand()
-{
-
-}
-
-void hand::print()
-{
-    std::string output;
-    for(int i=0; i<5; ++i)
-    {
-        output.append(getCardValue(cards[i]).append(" "));
-    }
-    printf("%s\n", output.c_str());
 }
