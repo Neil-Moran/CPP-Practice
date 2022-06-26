@@ -21,6 +21,8 @@ private:
 
     hand();
     ~hand();
+    bool containsCard(int value);
+    int containsOnePair();
     void drawCards(deck *deck);
     void print();
 
