@@ -11,5 +11,7 @@ int main()
     deck.print();
     printf("\n");
 
+    deck.playHand(1);
+
     return 0;
 }

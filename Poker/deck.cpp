@@ -5,32 +5,7 @@
 #include <stdio.h>
 #include <string>
 
-deck::deck()
-{   
-    countCardsDrawn = 0;
-
-    for(int i=0; i<52; ++i)
-    {
-        cards[i] = i+1;
-    }
-}
-
-deck::~deck()
-{
-}
-
-void deck::print()
-{
-    std::string result;
-    for(int i=0; i<52; ++i)
-    {
-        result.append(getCardValue(cards[i]).append(" "));
-        if((i+1)%13 == 0) result.append("\n");
-    }
-    printf("%s", result.c_str());
-}
-
-std::string deck::getCardValue(int card)
+std::string getCardValue(int card)
 {
     std::string currentCard;
     
@@ -86,6 +61,20 @@ std::string deck::getCardValue(int card)
     return currentCard;
 }
 
+deck::deck()
+{   
+    countCardsDrawn = 0;
+
+    for(int i=0; i<52; ++i)
+    {
+        cards[i] = i+1;
+    }
+}
+
+deck::~deck()
+{
+}
+
 void deck::riffleShuffle()
 {
     int cards_copy[52];
@@ -137,4 +126,46 @@ void deck::shuffle()
     {
         riffleShuffle();
     }
+    countCardsDrawn = 0;
+}
+
+void deck::playHand(int numPlayers)
+{
+    hand player1(this);
+    player1.print();
+}
+
+void deck::print()
+{
+    std::string result;
+    for(int i=0; i<52; ++i)
+    {
+        result.append(getCardValue(cards[i]).append(" "));
+        if((i+1)%13 == 0) result.append("\n");
+    }
+    printf("%s", result.c_str());
+}
+
+hand::hand(deck *deck)
+{
+    for(int i=0; i<5; ++i)
+    {
+        cards[i] = deck->cards[deck->countCardsDrawn];
+        ++deck->countCardsDrawn;
+    }
+}
+
+hand::~hand()
+{
+
+}
+
+void hand::print()
+{
+    std::string output;
+    for(int i=0; i<5; ++i)
+    {
+        output.append(getCardValue(cards[i]).append(" "));
+    }
+    printf("%s\n", output.c_str());
 }
