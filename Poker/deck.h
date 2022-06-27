@@ -13,8 +13,8 @@ public:
     deck();
     ~deck();
     void shuffle();
-    void playHand(int numPlayers);
     void playGame(int numPlayers, int numHands);
+    void playHand(int numPlayers);
     void print();
 
     friend class hand;

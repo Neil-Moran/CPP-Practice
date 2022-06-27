@@ -75,6 +75,18 @@ void deck::shuffle()
     countCardsDrawn = 0;
 }
 
+void deck::playGame(int numPlayers, int numHands)
+{
+    for(int i=0; i< numHands; ++i)
+    {
+        shuffle();
+        print();
+        printf("\n");
+        playHand(numPlayers);
+        printf("\n");
+    }
+}
+
 void deck::playHand(int numPlayers)
 {
     if(numPlayers > 10) numPlayers = 10;
@@ -87,20 +99,48 @@ void deck::playHand(int numPlayers)
         printf("Player %i: ", i+1);
         players[i].print();
     }
+    // print hand result
+    {
+        int winners = 1; // every i-th bit indicates whether player i is currently considered a winner
+        int numWinners = 1;
+        int winnerID = 0;
+
+        for(int i=1; i<numPlayers; ++i)
+        {
+            if(players[i].result < players[winnerID].result) // new winner
+            {
+                winners = 1 << i;
+                winnerID = i;
+                numWinners = 1;
+            }
+            else if(players[i].result == players[winnerID].result) // tie
+            {
+                winners |= 1 << i;
+                ++numWinners;
+            }
+        }
+
+        if(numWinners == 1) 
+            printf("Player %i Wins\n", winnerID+1);
+        
+        else 
+        {
+            std::string output = "Tie:";
+            for(int i=0; i<numPlayers, numWinners > 0; ++i)
+            {
+                if(winners & 1<<i)
+                {
+                    output.append(" Player ");
+                    output.append(std::to_string(i+1));
+                    --numWinners;
+                    if(numWinners > 0) output.append(" |");
+                }
+            }
+            printf("%s\n", output.c_str());
+        }
+    }
 
     delete[] players;
-}
-
-void deck::playGame(int numPlayers, int numHands)
-{
-    for(int i=0; i< numHands; ++i)
-    {
-        shuffle();
-        print();
-        printf("\n");
-        playHand(numPlayers);
-        printf("\n");
-    }
 }
 
 void deck::print()
