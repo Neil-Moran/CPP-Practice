@@ -6,7 +6,7 @@ int main()
     deck deck;
     deck.print();
     printf("\n");
-    deck.playGame(4, 10);
+    deck.playGame(4, 4);
 
     return 0;
 }

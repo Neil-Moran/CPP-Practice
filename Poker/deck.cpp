@@ -3,7 +3,7 @@
 #include "card.h"
 #include "deck.h"
 #include "hand.h"
-#include "squirrel3.h"
+#include "RNG.h"
 #include <stdio.h>
 #include <string>
 
@@ -26,13 +26,15 @@ void deck::riffleShuffle()
     int cards_copy[52];
     memcpy(cards_copy, cards, sizeof(cards));
 
+    RNG rng;
+
     // simulated riffle shuffle: split the deck in half, then 
     // randomly add cards back into the deck from both halves
     int i=0, l=0, r=26;
 
     while(l<26 && r<52)
     {
-        if(flipCoin()) // flip a coin; if tails we take a card from the left packet...
+        if(rng.flipCoin()) // flip a coin; if tails we take a card from the left packet...
         {
             cards[i] = cards_copy[l];
             ++l;
