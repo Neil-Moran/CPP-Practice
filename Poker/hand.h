@@ -20,9 +20,7 @@ private:
     handResult result;
 
     hand();
-    ~hand();
-    int partition(int array[], int low, int high);
-    void quickSort(int array[], int low, int high);
+    ~hand();   
     bool containsCard(int value);
     bool containsStraight();
     bool containsFlush();

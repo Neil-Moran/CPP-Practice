@@ -12,49 +12,6 @@ hand::~hand()
 {
 }
 
-int hand::partition(int array[], int low, int high)
-{
-    int pivot = array[high]%13; //select the right-most element as a pivot (arbitrary)
-    if(pivot == 0) pivot = 13;
-    int pi = low; // will be the partition index, the index where the pivot belongs
-
-    //find the correct index for the pivot
-    for(int i=low; i<high; ++i)
-    {
-        int curr = array[i]%13;
-        if(curr == 0) curr = 13;
-        if(curr<=pivot)
-        {
-            if(i!=pi)
-            {
-                int temp = array[pi];
-                array[pi] = array[i];
-                array[i] = temp;
-            }
-            ++pi;
-        }
-    }
-
-    if(pi != high) //move the pivot to the correct index, if not already there
-    {
-        int temp = array[pi];
-        array[pi] = array[high];
-        array[high] = temp;
-    }
-    return pi;
-}
-
-void hand::quickSort(int array[], int low, int high)
-{
-    if(low < high)
-    {
-        int pivot = partition(array, low, high);
-        
-        quickSort(array, low, pivot-1);
-        quickSort(array, pivot+1, high);
-    }
-}
-
 bool hand::containsCard(int value)
 {
     for(int i=0; i<5; ++i)
@@ -92,8 +49,8 @@ int hand::getFourOfAKind()
     || cards[1]%13 == cards[4]%13)
     {
         int value = cards[2]%13; //if we have FOAK the middle card must have the correct value to return
-        if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
-        else return value;
+        if(value < 2) value += 13; //ensure Ace(1) and King(13) are high
+        return value;
     }
 
     return 0;
@@ -122,8 +79,8 @@ int hand::getThreeOfAKind()
     || cards[2]%13 == cards[4]%13)
     {
         int value = cards[2]%13; //if we have TOAK the middle card must have the correct value to return
-        if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
-        else return value;
+        if(value < 2) value += 13; //ensure Ace(1) and King(13) are high
+        return value;
     }
 
     return 0;
@@ -141,8 +98,8 @@ int hand::getLowPair()
         int value = cards[i]%13;
         if(value == cards[i-1]%13)
         {
-            if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
-            else return value;
+            if(value < 2) value += 13; //ensure Ace(1) and King(13) are high
+            return value;
         }
     }
 
@@ -159,8 +116,8 @@ int hand::getHighPair()
         int value = cards[i]%13;
         if(value == cards[i-1]%13)
         {
-            if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
-            else return value;
+            if(value < 2) value += 13; //ensure Ace(1) and King(13) are high
+            return value;
         }
     }
 

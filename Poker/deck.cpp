@@ -77,7 +77,7 @@ void deck::shuffle()
 
 void deck::playGame(int numPlayers, int numHands)
 {
-    for(int i=0; i< numHands; ++i)
+    for(int i=0; i<numHands; ++i)
     {
         shuffle();
         print();
@@ -104,6 +104,7 @@ void deck::playHand(int numPlayers)
         int winners = 1; // every i-th bit indicates whether player i is currently considered a winner
         int numWinners = 1;
         int winnerID = 0;
+        quickSort(players[0].cards, 0, 4); // sort in case we need to tie break
 
         for(int i=1; i<numPlayers; ++i)
         {
@@ -112,11 +113,117 @@ void deck::playHand(int numPlayers)
                 winners = 1 << i;
                 winnerID = i;
                 numWinners = 1;
+                quickSort(players[i].cards, 0, 4); // sort in case we need to tie break
             }
-            else if(players[i].result == players[winnerID].result) // tie
+            else if(players[i].result == players[winnerID].result) // possible tie
             {
-                winners |= 1 << i;
-                ++numWinners;
+                // attempt to tie break 
+                int newWinnerID = -1;
+                quickSort(players[i].cards, 0, 4);
+
+                int highCardPlayerA, highCardPlayerB;
+
+                switch(players[winnerID].result) // this logic is audacious but correct ;)
+                {
+                case ROYAL_FLUSH: // identical hands, tie
+                    break;                     
+                case STRAIGHT_FLUSH: //same as straight, fall through
+                case STRAIGHT: // just compare the highest card
+                    highCardPlayerA = players[winnerID].cards[4]%13;
+                    if(highCardPlayerA < 2) highCardPlayerA += 13;
+
+                    highCardPlayerB = players[i].cards[4]%13;
+                    if(highCardPlayerB < 2) highCardPlayerB += 13;
+
+                    if(highCardPlayerA > highCardPlayerB)
+                        newWinnerID = winnerID;
+                    else if(highCardPlayerA < highCardPlayerB)
+                        newWinnerID = i;
+                    break;
+                case FULL_HOUSE: // first compare the three of a kind...
+                    highCardPlayerA = players[winnerID].getThreeOfAKind();
+                    highCardPlayerB = players[i].getThreeOfAKind();
+
+                    if(highCardPlayerA > highCardPlayerB)
+                    {
+                        newWinnerID = winnerID;
+                        break;
+                    }
+                    else if(highCardPlayerA < highCardPlayerB)
+                    {
+                        newWinnerID = i;
+                        break;
+                    }
+                    // ... if still a tie then fall through and compare the pair (it could be a high pair or a low pair)
+                case FOUR_OF_A_KIND: //FOAK is also a pair, so fall through and compare that!
+                case THREE_OF_A_KIND: //TOAK is also a pair, so fall through and compare that!
+                case TWO_PAIR: // first compare high pair...
+                    highCardPlayerA = players[winnerID].getHighPair();
+                    highCardPlayerB = players[i].getHighPair();
+
+                    if(highCardPlayerA > highCardPlayerB)
+                    {
+                        newWinnerID = winnerID;
+                        break;
+                    }
+                    else if(highCardPlayerA < highCardPlayerB)
+                    {
+                        newWinnerID = i;
+                        break;
+                    }
+                    // ...if still a tie then fall through and compare low pair
+                case ONE_PAIR:
+                    highCardPlayerA = players[winnerID].getLowPair();
+                    highCardPlayerB = players[i].getLowPair();
+
+                    if(highCardPlayerA > highCardPlayerB)
+                    {
+                        newWinnerID = winnerID;
+                        break;
+                    }
+                    else if(highCardPlayerA < highCardPlayerB)
+                    {
+                        newWinnerID = i;
+                        break;
+                    }
+                            // if still a tie fall through and compare highest card(s)
+                case FLUSH: // fall through and compare highest card(s)
+                case HIGH_CARD:
+                    for(int j=4; j>=0; --j)
+                    {
+                        highCardPlayerA = players[winnerID].cards[j]%13;
+                        if(highCardPlayerA < 2) highCardPlayerA += 13;
+
+                        highCardPlayerB = players[i].cards[j]%13;
+                        if(highCardPlayerB < 2) highCardPlayerB += 13;
+
+                        if(highCardPlayerA > highCardPlayerB)
+                        {
+                            newWinnerID = winnerID;
+                            break;
+                        }
+                        else if(highCardPlayerA < highCardPlayerB)
+                        {
+                            newWinnerID = i;
+                            break;
+                        }
+                    }
+                    break;  
+                }
+                if(newWinnerID != -1) // not a tie
+                {
+                    if(newWinnerID != winnerID) // new winner
+                    {
+                        winners = 1 << newWinnerID;
+                        winnerID = newWinnerID;
+                        numWinners = 1;
+                    }
+                }
+                else // tie
+                {
+                    winners |= 1 << i;
+                    ++numWinners;
+                }
             }
         }
 
