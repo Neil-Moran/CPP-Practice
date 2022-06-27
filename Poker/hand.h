@@ -24,6 +24,8 @@ private:
     int partition(int array[], int low, int high);
     void quickSort(int array[], int low, int high);
     bool containsCard(int value);
+    bool containsStraight();
+    bool containsFlush();
     int getFourOfAKind();
     bool containsFullHouse();
     int getThreeOfAKind();

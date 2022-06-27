@@ -64,6 +64,25 @@ bool hand::containsCard(int value)
     return false;
 }
 
+bool hand::containsStraight()
+{
+    for(int i=0; i<4; ++i)
+    {
+        if(cards[i]%13 + 1 != cards[i+1]%13) return false;
+    }
+    return true;
+}
+
+bool hand::containsFlush()
+{
+    int suit = (cards[0]-1)/13;
+    for(int i=1; i<5; ++i)
+    {
+        if((cards[i]-1)/13 != suit) return false;
+    }
+    return true;
+}
+
 int hand::getFourOfAKind()
 {
     // since the hand is in order we can verify this by comparing
@@ -163,7 +182,7 @@ bool hand::containsTwoPair()
 
 void hand::drawCards(deck *deck)
 {
-    int cardsCopy[5]; //we're going to sort the hand for easier result calculation, but store the original order to be displayed on the screen
+    int cardsCopy[5]; // we're going to sort the hand for easier result calculation, but store the original order to be displayed on the screen
 
     for(int i=0; i<5; ++i)
     {
@@ -172,21 +191,26 @@ void hand::drawCards(deck *deck)
         ++deck->countCardsDrawn;
     }
 
-    quickSort(cards, 0, 4);
+    quickSort(cards, 0, 4); // sort the hand by value, ignoring suit
 
-    //calculate result   
-    if(containsCard(26) && containsCard(38) && containsCard(37) && containsCard(36) && containsCard(35)) result = ROYAL_FLUSH;
-    else if(false) result = STRAIGHT_FLUSH;
-    else if(getFourOfAKind()) result = FOUR_OF_A_KIND;
-    else if(containsFullHouse()) result = FULL_HOUSE;
-    else if(false) result = FLUSH;
-    else if(false) result = STRAIGHT;
-    else if(getThreeOfAKind()) result = THREE_OF_A_KIND;
-    else if(containsTwoPair()) result = TWO_PAIR;
-    else if(getLowPair()) result = ONE_PAIR;
-    else result = HIGH_CARD;
+    // calculate result   
+    if(containsCard(27) && containsCard(39) && containsCard(38) && containsCard(37) && containsCard(36)) result = ROYAL_FLUSH;
+    else 
+    {
+        bool straight = containsStraight();
+        bool flush = containsFlush();
+        if(straight && flush) result = STRAIGHT_FLUSH;
+        else if(straight) result = STRAIGHT; // there are better results but none are possible if there is a straight
+        else if(flush) result = FLUSH; // there are better results but none are possible if there is a flush
+        else if(getFourOfAKind()) result = FOUR_OF_A_KIND;
+        else if(containsFullHouse()) result = FULL_HOUSE;
+        else if(getThreeOfAKind()) result = THREE_OF_A_KIND;
+        else if(containsTwoPair()) result = TWO_PAIR;
+        else if(getLowPair()) result = ONE_PAIR;
+        else result = HIGH_CARD;
+    }
 
-    //return hand to original order
+    // return hand to original order
     for(int i=0; i<5; ++i)
     {
         cards[i] = cardsCopy[i];
