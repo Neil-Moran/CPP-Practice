@@ -14,6 +14,7 @@ public:
     ~deck();
     void shuffle();
     void playHand(int numPlayers);
+    void playGame(int numPlayers, int numHands);
     void print();
 
     friend class hand;

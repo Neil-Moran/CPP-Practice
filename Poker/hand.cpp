@@ -64,34 +64,111 @@ bool hand::containsCard(int value)
     return false;
 }
 
-int hand::containsOnePair()
+int hand::getFourOfAKind()
 {
-    // NB: assumes you've already verified the hand  
-    // does not contain a better result!
-    // returns the value of the pair (e.g. pair of Queens -> 12)
-    // or 0 if no pair found
+    // since the hand is in order we can verify this by comparing
+    // cards 1 and 4, 2 and 5 - if either match we have FOAK!
 
-    for(int i=0; i<5; ++i)
+    if(cards[0]%13 == cards[3]%13 
+    || cards[1]%13 == cards[4]%13)
+    {
+        int value = cards[2]%13; //if we have FOAK the middle card must have the correct value to return
+        if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
+        else return value;
+    }
+
+    return 0;
+}
+
+bool hand::containsFullHouse()
+{
+    // since the hand is in order we can verify this with a few comparisons
+    // we need either a pair on the left and three of a kind on the right,
+    // or vice versa
+    if(cards[0]%13 == cards[1]%13 && cards[2]%13 == cards[4]%13
+    || cards[0]%13 == cards[2]%13 && cards[3]%13 == cards[4]%13)
+        return true;
+    else return false;
+}
+
+int hand::getThreeOfAKind()
+{
+    // used to check for three of a kind - NB: assumes you've already  
+    // verified the hand does not contain a better result!
+    // since the hand is in order we can verify this by comparing
+    // cards 1 and 3, 2 and 4, 3 and 5 - if any match we have TOAK!
+
+    if(cards[0]%13 == cards[2]%13 
+    || cards[1]%13 == cards[3]%13 
+    || cards[2]%13 == cards[4]%13)
+    {
+        int value = cards[2]%13; //if we have TOAK the middle card must have the correct value to return
+        if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
+        else return value;
+    }
+
+    return 0;
+}
+
+int hand::getLowPair()
+{
+    // used to check for one pair - NB: assumes you've already  
+    // verified the hand does not contain a better result!
+    // traverses the sorted hand and returns the value of the first pair 
+    // (e.g. pair of Queens -> 12) or 0 if no pair found
+
+    for(int i=1; i<5; ++i)
     {
         int value = cards[i]%13;
-        for(int j=i+1; j<5; ++j)
+        if(value == cards[i-1]%13)
         {
-            if(value == cards[j]%13)
-            {
-                if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
-                else return value;
-            }
+            if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
+            else return value;
         }
     }
 
     return 0;
 }
 
+int hand::getHighPair()
+{
+    // traverses the sorted hand BACKWARDS and returns the value 
+    // of the first pair, i.e. the pair with the highest value
+    // (e.g. pair of Queens -> 12) or 0 if no pair found
+    for(int i=4; i>0; --i)
+    {
+        int value = cards[i]%13;
+        if(value == cards[i-1]%13)
+        {
+            if(value == 0) return 13; //King%13 = 0 but 0 is reserved as the negative result
+            else return value;
+        }
+    }
+
+    return 0;
+}
+
+bool hand::containsTwoPair()
+{
+    // used to check for two pair - NB: assumes you've already  
+    // verified the hand does not contain a better result!
+    // if the hand contains a low pair and a high pair, and
+    // they don't have the same value, then there must be two pairs
+    int lowPair = getLowPair();
+    int highPair = getHighPair();
+
+    if(lowPair && highPair && lowPair != highPair) return true;
+    else return false;
+}
+
 void hand::drawCards(deck *deck)
 {
+    int cardsCopy[5]; //we're going to sort the hand for easier result calculation, but store the original order to be displayed on the screen
+
     for(int i=0; i<5; ++i)
     {
         cards[i] = deck->cards[deck->countCardsDrawn];
+        cardsCopy[i] = cards[i];
         ++deck->countCardsDrawn;
     }
 
@@ -100,14 +177,20 @@ void hand::drawCards(deck *deck)
     //calculate result   
     if(containsCard(26) && containsCard(38) && containsCard(37) && containsCard(36) && containsCard(35)) result = ROYAL_FLUSH;
     else if(false) result = STRAIGHT_FLUSH;
-    else if(false) result = FOUR_OF_A_KIND;
-    else if(false) result = FULL_HOUSE;
+    else if(getFourOfAKind()) result = FOUR_OF_A_KIND;
+    else if(containsFullHouse()) result = FULL_HOUSE;
     else if(false) result = FLUSH;
     else if(false) result = STRAIGHT;
-    else if(false) result = THREE_OF_A_KIND;
-    else if(false) result = TWO_PAIR;
-    else if(containsOnePair()) result = ONE_PAIR;
+    else if(getThreeOfAKind()) result = THREE_OF_A_KIND;
+    else if(containsTwoPair()) result = TWO_PAIR;
+    else if(getLowPair()) result = ONE_PAIR;
     else result = HIGH_CARD;
+
+    //return hand to original order
+    for(int i=0; i<5; ++i)
+    {
+        cards[i] = cardsCopy[i];
+    }
 }
 
 void hand::print()

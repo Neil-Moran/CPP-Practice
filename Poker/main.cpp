@@ -6,11 +6,7 @@ int main()
     deck deck;
     deck.print();
     printf("\n");
-
-    deck.shuffle();
-    deck.print();
-    printf("\n");
-    deck.playHand(10);
+    deck.playGame(10, 10);    
 
     return 0;
 }

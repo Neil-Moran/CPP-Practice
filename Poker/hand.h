@@ -24,7 +24,12 @@ private:
     int partition(int array[], int low, int high);
     void quickSort(int array[], int low, int high);
     bool containsCard(int value);
-    int containsOnePair();
+    int getFourOfAKind();
+    bool containsFullHouse();
+    int getThreeOfAKind();
+    int getLowPair();
+    int getHighPair();
+    bool containsTwoPair();
     void drawCards(deck *deck);
     void print();
 

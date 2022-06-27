@@ -28,7 +28,7 @@ void deck::riffleShuffle()
 
     // simulated riffle shuffle: split the deck in half, then 
     // randomly add cards back into the deck from both halves
-    int i = 0, l = 0, r = 26;
+    int i=0, l=0, r=26;
 
     while(l<26 && r<52)
     {
@@ -78,7 +78,7 @@ void deck::shuffle()
 void deck::playHand(int numPlayers)
 {
     if(numPlayers > 10) numPlayers = 10;
-    
+
     hand *players = new hand[numPlayers];
 
     for(int i=0; i<numPlayers; ++i)
@@ -89,6 +89,18 @@ void deck::playHand(int numPlayers)
     }
 
     delete[] players;
+}
+
+void deck::playGame(int numPlayers, int numHands)
+{
+    for(int i=0; i< numHands; ++i)
+    {
+        shuffle();
+        print();
+        printf("\n");
+        playHand(numPlayers);
+        printf("\n");
+    }
 }
 
 void deck::print()
