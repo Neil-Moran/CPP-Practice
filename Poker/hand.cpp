@@ -25,7 +25,12 @@ bool hand::containsStraight()
 {
     for(int i=0; i<4; ++i)
     {
-        if(cards[i]%13 + 1 != cards[i+1]%13) return false;
+        // this is ugly - we order the hand with Aces high
+        // so if the last two cards are 5 and an Ace, then
+        // we have a straight of A 2 3 4 5 and should return true;
+        if(i==3 && cards[i]%13 == 5 && cards[i+1]%13 == 1) return true;
+
+        if((cards[i]%13 + 1)%13 != cards[i+1]%13) return false;
     }
     return true;
 }

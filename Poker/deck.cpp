@@ -133,9 +133,11 @@ void deck::playHand(int numPlayers)
                 case STRAIGHT: // just compare the highest card
                     highCardPlayerA = players[winnerID].cards[4]%13;
                     if(highCardPlayerA < 2) highCardPlayerA += 13;
+                    if(highCardPlayerA == 14 && players[winnerID].cards[3]%13 == 5) highCardPlayerA = 5; // if the straight is A 2 3 4 5, the high card is 5
 
                     highCardPlayerB = players[i].cards[4]%13;
                     if(highCardPlayerB < 2) highCardPlayerB += 13;
+                    if(highCardPlayerB == 14 && players[i].cards[3]%13 == 5) highCardPlayerB = 5; // if the straight is A 2 3 4 5, the high card is 5
 
                     if(highCardPlayerA > highCardPlayerB)
                         newWinnerID = winnerID;
