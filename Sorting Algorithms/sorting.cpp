@@ -52,9 +52,8 @@ void profileBubbleSort()
 {
     BIG_ARRAY 
     printf("Profiling Bubble Sort\n");
-    TIME_START
+    Timer timer;
     bubbleSortPrivate(array, 10000);
-    TIME_END
 }
 
 inline void selectionSortPrivate(int array[], int size)
@@ -91,9 +90,8 @@ void profileSelectionSort()
 {
     BIG_ARRAY
     printf("Profiling Selection Sort\n");
-    TIME_START
-    selectionSortPrivate(array, 10000);
-    TIME_END
+    Timer timer;
+    selectionSortPrivate(array, 10000);    
 }
 
 void merge(int array[], int l, int mid, int r) //assuming array is sorted from l->mid & mid+1->r, merge those two sub arrays
@@ -179,9 +177,8 @@ void profileMergeSort()
 {
     BIG_ARRAY
     printf("Profiling Merge Sort\n");
-    TIME_START
+    Timer timer;
     mergeSort(array, 0, 10000-1);
-    TIME_END
 }
 
 int partition(int array[], int low, int high)
@@ -239,7 +236,6 @@ void profileQuickSort()
 {
     BIG_ARRAY
     printf("Profiling Quick Sort\n");
-    TIME_START
+    Timer timer;
     quickSort(array, 0, 10000-1);
-    TIME_END
 }
