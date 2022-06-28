@@ -20,8 +20,8 @@ private:
     handResult result;
 
     hand();
-    ~hand();   
-    bool containsCard(int value);
+    ~hand();
+    void calculateResult();
     bool containsStraight();
     bool containsFlush();
     int getFourOfAKind();

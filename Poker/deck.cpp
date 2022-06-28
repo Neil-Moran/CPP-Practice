@@ -144,7 +144,21 @@ void deck::playHand(int numPlayers)
 
                 switch(bestResult) // this logic is audacious but correct ;)
                 {
-                case ROYAL_FLUSH: // identical hands, tie
+                case ROYAL_FLUSH: // whichever hand is composed of the highest ranking suit wins
+                    // the card IDs are ordered so that S > H > D > C!
+                    highCardPlayerA = players[winnerID].cards[4];
+                    highCardPlayerB = players[i].cards[4];
+
+                    if(highCardPlayerA > highCardPlayerB)
+                    {
+                        newWinnerID = winnerID;
+                        break;
+                    }
+                    else if(highCardPlayerA < highCardPlayerB)
+                    {
+                        newWinnerID = i;
+                        break;
+                    }
                     break;                     
                 case STRAIGHT_FLUSH: //same as straight, fall through
                 case STRAIGHT: // just compare the highest card

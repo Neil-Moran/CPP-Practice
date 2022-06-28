@@ -12,13 +12,39 @@ hand::~hand()
 {
 }
 
-bool hand::containsCard(int value)
+void hand::calculateResult()
 {
+    // we're going to sort the hand for easier result calculation, but store the original order to be displayed on the screen
+    int cardsCopy[5] = 
+    {
+        cards[0], cards[1], cards[2], cards[3], cards[4], 
+    }; 
+
+    quickSort(cards, 0, 4); // sort the hand by value, ignoring suit
+
+    // calculate result   
+    bool straight = containsStraight();
+    bool flush = containsFlush();
+    
+    if(straight && flush) 
+    {
+        if(cards[3]%13 == 0) result = ROYAL_FLUSH; //if there is a straight flush and the fourth card is a King (can't check fifth card is an Ace as it could be 2 3 4 5 A)
+        else result = STRAIGHT_FLUSH;
+    }
+    else if(straight) result = STRAIGHT; // there are better results but none are possible if there is a straight
+    else if(flush) result = FLUSH; // there are better results but none are possible if there is a flush
+    else if(getFourOfAKind()) result = FOUR_OF_A_KIND;
+    else if(containsFullHouse()) result = FULL_HOUSE;
+    else if(getThreeOfAKind()) result = THREE_OF_A_KIND;
+    else if(containsTwoPair()) result = TWO_PAIR;
+    else if(getLowPair()) result = ONE_PAIR;
+    else result = HIGH_CARD;    
+
+    // return hand to original order
     for(int i=0; i<5; ++i)
     {
-        if(cards[i] == value) return true;
+        cards[i] = cardsCopy[i];
     }
-    return false;
 }
 
 bool hand::containsStraight()
@@ -144,39 +170,13 @@ bool hand::containsTwoPair()
 
 void hand::drawCards(deck *deck)
 {
-    int cardsCopy[5]; // we're going to sort the hand for easier result calculation, but store the original order to be displayed on the screen
-
     for(int i=0; i<5; ++i)
     {
         cards[i] = deck->cards[deck->countCardsDrawn];
-        cardsCopy[i] = cards[i];
         ++deck->countCardsDrawn;
     }
 
-    quickSort(cards, 0, 4); // sort the hand by value, ignoring suit
-
-    // calculate result   
-    if(containsCard(27) && containsCard(39) && containsCard(38) && containsCard(37) && containsCard(36)) result = ROYAL_FLUSH;
-    else 
-    {
-        bool straight = containsStraight();
-        bool flush = containsFlush();
-        if(straight && flush) result = STRAIGHT_FLUSH;
-        else if(straight) result = STRAIGHT; // there are better results but none are possible if there is a straight
-        else if(flush) result = FLUSH; // there are better results but none are possible if there is a flush
-        else if(getFourOfAKind()) result = FOUR_OF_A_KIND;
-        else if(containsFullHouse()) result = FULL_HOUSE;
-        else if(getThreeOfAKind()) result = THREE_OF_A_KIND;
-        else if(containsTwoPair()) result = TWO_PAIR;
-        else if(getLowPair()) result = ONE_PAIR;
-        else result = HIGH_CARD;
-    }
-
-    // return hand to original order
-    for(int i=0; i<5; ++i)
-    {
-        cards[i] = cardsCopy[i];
-    }
+    calculateResult();
 }
 
 void hand::print()

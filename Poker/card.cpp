@@ -33,22 +33,22 @@ std::string getCardValue(int card)
 
     int suit = (card-1)/13;
 
-    switch (suit)
+    switch (suit) // suits are ordered by their ranking for a royal flush
     {
     case 0:
         currentCard.append("C");
         break;
 
     case 1:
-        currentCard.append("H");
+        currentCard.append("D");
         break;
 
     case 2:
-        currentCard.append("S");
+        currentCard.append("H");
         break;
 
     case 3:
-        currentCard.append("D");
+        currentCard.append("S");
         break;
     
     default:
