@@ -1,22 +1,19 @@
+#include "timing.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string>
-#include <chrono>
-#define TIME_START using namespace std::chrono; high_resolution_clock::time_point start = high_resolution_clock::now();
-#define TIME_END high_resolution_clock::time_point end = high_resolution_clock::now(); nanoseconds elapsed = duration_cast<nanoseconds>(end - start); printf("Time: %.8f seconds\n", elapsed.count() * 1e-9);
 
 void primes(const int MAX_LIMIT) //print all primes between 0 and the specified maximum limit
 {   
-    TIME_START
-
     printf("All primes between 0 and %d: ", MAX_LIMIT);
     
+    Timer timer;
+
     if(MAX_LIMIT<2)
     {
         printf("\n");
         return;
     }
-    printf("2 "); //print 2 as we know it's the first prime, and this lets us skip all even integers later!
 
     //Series denoting the odd integers starting from 3, i.e. f(i)=3+2i. If bit is 1 the integer is prime. 
     //We will unset the bits of non-primes using the Sieve of Eratosthenes below
@@ -29,7 +26,7 @@ void primes(const int MAX_LIMIT) //print all primes between 0 and the specified 
         primeList[i] = 0xFFFFFFFFFFFFFFFFULL;
     }
 
-    std::string primes;
+    std::string primes = "2 "; //add 2 to output as we know it's the first prime, and this lets us skip all even integers later! 
 
     for(int i=0, arrayBucket=0, arrayOffset=0; //i is our global index but we have multiple arrays; arrayBucket is the current array and arrayOffset is the index into the current array
         i <= (MAX_LIMIT-3)/2; //loop until we've reached the max limit, i.e. while 3+2i <= MAX_LIMIT
@@ -55,9 +52,10 @@ void primes(const int MAX_LIMIT) //print all primes between 0 and the specified 
             }            
         }
     }
-    printf("%s\n", primes.c_str());
 
-    TIME_END
+    timer.stop();
+    printf("%s\n", primes.c_str());
+    
     delete[] primeList;
 }
 
