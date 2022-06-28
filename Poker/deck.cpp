@@ -106,18 +106,33 @@ void deck::playHand(int numPlayers)
         int winners = 1; // every i-th bit indicates whether player i is currently considered a winner
         int numWinners = 1;
         int winnerID = 0;
-        quickSort(players[0].cards, 0, 4); // sort in case we need to tie break
+        
+        handResult bestResult = HIGH_CARD;
 
-        for(int i=1; i<numPlayers; ++i)
+        // first find the best hand result, ignoring ties
+        for(int i=0; i<numPlayers; ++i)
         {
-            if(players[i].result < players[winnerID].result) // new winner
+            if(players[i].result < bestResult)
+            {
+                winners = 1 << i;
+                winnerID = i;
+                bestResult = players[i].result;
+            }
+        }
+
+        quickSort(players[winnerID].cards, 0, 4); // sort in case we need to tie break
+
+        // then find the player(s) with the best hand
+        for(int i=winnerID+1; i<numPlayers; ++i)
+        {
+            if(players[i].result < bestResult) // new winner
             {
                 winners = 1 << i;
                 winnerID = i;
                 numWinners = 1;
                 quickSort(players[i].cards, 0, 4); // sort in case we need to tie break
             }
-            else if(players[i].result == players[winnerID].result) // possible tie
+            else if(players[i].result == bestResult) // possible tie
             {
                 // attempt to tie break 
                 int newWinnerID = -1;
@@ -125,7 +140,7 @@ void deck::playHand(int numPlayers)
 
                 int highCardPlayerA, highCardPlayerB;
 
-                switch(players[winnerID].result) // this logic is audacious but correct ;)
+                switch(bestResult) // this logic is audacious but correct ;)
                 {
                 case ROYAL_FLUSH: // identical hands, tie
                     break;                     
@@ -237,7 +252,7 @@ void deck::playHand(int numPlayers)
         else 
         {
             std::string output = "Tie:";
-            for(int i=0; i<numPlayers, numWinners > 0; ++i)
+            for(int i=0; i<numPlayers, numWinners>0; ++i)
             {
                 if(winners & 1<<i)
                 {
