@@ -4,6 +4,7 @@
 #include "deck.h"
 #include "hand.h"
 #include "RNG.h"
+#include "timing.h"
 #include <stdio.h>
 #include <string>
 
@@ -79,6 +80,7 @@ void deck::shuffle()
 
 void deck::playGame(int numPlayers, int numHands)
 {
+    Timer timer;
     for(int i=0; i<numHands; ++i)
     {
         shuffle();
