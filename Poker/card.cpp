@@ -58,7 +58,7 @@ std::string getCardValue(int card)
     return currentCard;
 }
 
-int partition(int array[], int low, int high)
+static int partition(int array[], int low, int high)
 {
     int pivot = array[high]%13; //select the right-most element as a pivot (arbitrary)
     if(pivot < 2) pivot += 13; //ensure Ace(1) and King(13) are high

@@ -18,10 +18,6 @@ deck::deck()
     }
 }
 
-deck::~deck()
-{
-}
-
 void deck::riffleShuffle()
 {
     int cards_copy[52];
@@ -97,32 +93,43 @@ void deck::playHand(int numPlayers)
 
     hand *players = new hand[numPlayers];
 
+    // deal and print hands
     for(int i=0; i<numPlayers; ++i)
     {
         players[i].drawCards(this);
         printf("Player %i: ", i+1);
         players[i].print();
     }
-    // print hand result
+
+    // print result
+    std::string result = calculateResult(players, numPlayers);    
+    printf("%s\n", result.c_str());
+
+    delete[] players;
+}
+
+std::string deck::calculateResult(hand *players, int numPlayers)
+{
+    std::string result;
+
+    int winners = 1; // every i-th bit indicates whether player i is currently considered a winner
+    int numWinners = 1;
+    int winnerID = 0;
+    
+    handResult bestResult = players[0].result;
+
+    // first find the first instance of the best hand result, ignoring ties
+    for(int i=0; i<numPlayers; ++i)
     {
-        int winners = 1; // every i-th bit indicates whether player i is currently considered a winner
-        int numWinners = 1;
-        int winnerID = 0;
-        
-        handResult bestResult = HIGH_CARD;
-
-        // first find the best hand result, ignoring ties
-        for(int i=0; i<numPlayers; ++i)
+        if(players[i].result < bestResult)
         {
-            if(players[i].result < bestResult)
-            {
-                winners = 1 << i;
-                winnerID = i;
-                bestResult = players[i].result;
-            }
+            winners = 1 << i;
+            winnerID = i;
+            bestResult = players[i].result;
         }
+    }
 
-        quickSort(players[winnerID].cards, 0, 4); // sort in case we need to tie break
+    quickSort(players[winnerID].cards, 0, 4); // sort in case we need to tie break
 
         // then find the player(s) with the best hand
         for(int i=winnerID+1; i<numPlayers; ++i)
@@ -263,26 +270,27 @@ void deck::playHand(int numPlayers)
         }
 
         if(numWinners == 1) 
-            printf("Player %i Wins\n", winnerID+1);
+        {
+            result = "Player ";
+            result.append(std::to_string(winnerID+1)).append(" Wins");
+        }
         
         else 
         {
-            std::string output = "Tie:";
+            result = "Tie:";
             for(int i=0; i<numPlayers, numWinners>0; ++i)
             {
                 if(winners & 1<<i)
                 {
-                    output.append(" Player ");
-                    output.append(std::to_string(i+1));
+                    result.append(" Player ");
+                    result.append(std::to_string(i+1));
                     --numWinners;
-                    if(numWinners > 0) output.append(" |");
+                    if(numWinners > 0) result.append(" |");
                 }
             }
-            printf("%s\n", output.c_str());
         }
-    }
 
-    delete[] players;
+        return result;
 }
 
 void deck::print()

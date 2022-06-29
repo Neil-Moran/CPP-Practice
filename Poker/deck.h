@@ -3,19 +3,19 @@
 
 class deck
 {
+    friend class hand;
+
+public:
+    deck();
+    void shuffle();
+    void playGame(int numPlayers, int numHands);
+    static std::string calculateResult(hand *players, int numPlayers);
+    void print();  
+
 private:
     int cards[52];
     int countCardsDrawn;
 
     void riffleShuffle();
-
-public:
-    deck();
-    ~deck();
-    void shuffle();
-    void playGame(int numPlayers, int numHands);
-    void playHand(int numPlayers);
-    void print();
-
-    friend class hand;
+    void playHand(int numPlayers);  
 };

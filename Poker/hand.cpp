@@ -4,12 +4,59 @@
 #include "deck.h"
 #include "hand.h"
 
-hand::hand()
+void hand::drawCards(deck *deck)
 {
+    for(int i=0; i<5; ++i)
+    {
+        cards[i] = deck->cards[deck->countCardsDrawn];
+        ++deck->countCardsDrawn;
+    }
+
+    calculateResult();
 }
 
-hand::~hand()
+void hand::print()
 {
+    std::string output;
+    for(int i=0; i<5; ++i)
+    {
+        output.append(getCardValue(cards[i]).append(" "));
+    }
+
+    switch (result)
+    {
+    case ROYAL_FLUSH:
+        output.append("- Royal Flush\n");
+        break;
+    case STRAIGHT_FLUSH:
+        output.append("- Straight Flush\n");
+        break;
+    case FOUR_OF_A_KIND:
+        output.append("- Four of a Kind\n");
+        break;
+    case FULL_HOUSE:
+        output.append("- Full House\n");
+        break;
+    case FLUSH:
+        output.append("- Flush\n");
+        break;
+    case STRAIGHT:
+        output.append("- Straight\n");
+        break;
+    case THREE_OF_A_KIND:
+        output.append("- Three of a Kind\n");
+        break;
+    case TWO_PAIR:
+        output.append("- Two Pair\n");
+        break;
+    case ONE_PAIR:
+        output.append("- One Pair\n");
+        break;
+    case HIGH_CARD:
+        output.append("- High Card\n");
+        break;  
+    }
+    printf("%s", output.c_str());
 }
 
 void hand::calculateResult()
@@ -166,59 +213,4 @@ bool hand::containsTwoPair()
 
     if(lowPair && highPair && lowPair != highPair) return true;
     else return false;
-}
-
-void hand::drawCards(deck *deck)
-{
-    for(int i=0; i<5; ++i)
-    {
-        cards[i] = deck->cards[deck->countCardsDrawn];
-        ++deck->countCardsDrawn;
-    }
-
-    calculateResult();
-}
-
-void hand::print()
-{
-    std::string output;
-    for(int i=0; i<5; ++i)
-    {
-        output.append(getCardValue(cards[i]).append(" "));
-    }
-
-    switch (result)
-    {
-    case ROYAL_FLUSH:
-        output.append("- Royal Flush\n");
-        break;
-    case STRAIGHT_FLUSH:
-        output.append("- Straight Flush\n");
-        break;
-    case FOUR_OF_A_KIND:
-        output.append("- Four of a Kind\n");
-        break;
-    case FULL_HOUSE:
-        output.append("- Full House\n");
-        break;
-    case FLUSH:
-        output.append("- Flush\n");
-        break;
-    case STRAIGHT:
-        output.append("- Straight\n");
-        break;
-    case THREE_OF_A_KIND:
-        output.append("- Three of a Kind\n");
-        break;
-    case TWO_PAIR:
-        output.append("- Two Pair\n");
-        break;
-    case ONE_PAIR:
-        output.append("- One Pair\n");
-        break;
-    case HIGH_CARD:
-        output.append("- High Card\n");
-        break;  
-    }
-    printf("%s", output.c_str());
 }

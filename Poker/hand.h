@@ -15,12 +15,14 @@ enum handResult {
 
 class hand
 {
+    friend class deck;
+    
 private:
     int cards[5];    
     handResult result;
+    void drawCards(deck *deck);
+    void print();
 
-    hand();
-    ~hand();
     void calculateResult();
     bool containsStraight();
     bool containsFlush();
@@ -29,9 +31,5 @@ private:
     int getThreeOfAKind();
     int getLowPair();
     int getHighPair();
-    bool containsTwoPair();
-    void drawCards(deck *deck);
-    void print();
-
-    friend class deck;
+    bool containsTwoPair();    
 };
