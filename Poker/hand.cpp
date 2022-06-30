@@ -122,7 +122,7 @@ void hand::calculateScore()
 
         score += highCard;
         break;
-    case FULL_HOUSE: break;// fall through, check TOAK then the pair
+    case FULL_HOUSE: // fall through, check TOAK then the pair
     case FOUR_OF_A_KIND:
         highCard = getThreeOfAKind(); // TOAK is also FOAK, and this lets Full House use the same logic! 
         score += highCard * multiplier;

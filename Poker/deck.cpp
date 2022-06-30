@@ -49,17 +49,17 @@ void deck::riffleShuffle()
     // we've exhausted one of the packets, finish off the cards from the remaining packet
     if(l<26)
     {
-        for(; l<26; ++l, ++i)
+        while(l<26)
         {
-            cards[i] = cards_copy[l];
+            cards[i++] = cards_copy[l++];
         }
     }
 
     if(r<52)
     {
-        for(; r<52; ++r, ++i)
+        while(r<52)
         {
-            cards[i] = cards_copy[r];
+            cards[i++] = cards_copy[r++];
         }
     }
 }
@@ -284,7 +284,7 @@ std::string deck::calculateResultOld(hand *players, int numPlayers)
         else 
         {
             result = "Tie:";
-            for(int i=winnerID; i<numPlayers, numWinners>0; ++i)
+            for(int i=winnerID; i<numPlayers && numWinners>0; ++i)
             {
                 if(winners & 1<<i)
                 {
@@ -329,7 +329,7 @@ std::string deck::calculateResult(hand *players, int numPlayers)
     else 
     {
         result = "Tie:";
-        for(int i=winnerID; i<numPlayers, numWinners>0; ++i)
+        for(int i=winnerID; i<numPlayers && numWinners>0; ++i)
         {
             if(players[i].score == players[winnerID].score)
             {
