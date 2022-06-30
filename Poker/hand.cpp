@@ -85,12 +85,132 @@ void hand::calculateResult()
     else if(getThreeOfAKind()) result = THREE_OF_A_KIND;
     else if(containsTwoPair()) result = TWO_PAIR;
     else if(getLowPair()) result = ONE_PAIR;
-    else result = HIGH_CARD;    
+    else result = HIGH_CARD;
+
+    calculateScore();
 
     // return hand to original order
     for(int i=0; i<5; ++i)
     {
         cards[i] = cardsCopy[i];
+    }
+}
+
+void hand::calculateScore()
+{
+    // NB: Assumes hand is currently sorted
+
+    uint64_t multiplier = 100000000000; // multiplier to weight different tie break conditions, reduced every time it's used
+    score = result * multiplier; // result is most important differentiator
+    multiplier /= 100;
+
+    int highCard, secondPair, currCard; // various card variables used below
+
+    // add tie break scores depending on hand
+    switch(result)
+    {
+    case ROYAL_FLUSH: // whichever hand is composed of the highest ranking suit wins
+        // the card IDs are ordered so that S > H > D > C, so just add any one card to the score
+        score += cards[4];
+        break;
+    case STRAIGHT_FLUSH: //same as straight, fall through
+    case STRAIGHT: // only highest card matters 
+        highCard = cards[4]%13;
+        if(highCard < 2) highCard += 13;
+
+        if(highCard == 14 && cards[3]%13 == 5) highCard = 5; // if the straight is A 2 3 4 5, the high card is 5
+
+        score += highCard;
+        break;
+    case FULL_HOUSE: break;// fall through, check TOAK then the pair
+    case FOUR_OF_A_KIND:
+        highCard = getThreeOfAKind(); // TOAK is also FOAK, and this lets Full House use the same logic! 
+        score += highCard * multiplier;
+        multiplier /= 100;
+        
+        // add the score of the other card (if FOAK) or pair (if Full House) apart from the TOAK
+        // that value must be either the first or last card 
+        if(cards[4]%13 != cards[2]%13) 
+            currCard = cards[4]%13;
+        else currCard = cards[0]%13;
+
+        if(currCard < 2) currCard += 13;
+
+        score += currCard * multiplier;
+        break;
+    case THREE_OF_A_KIND:
+        // add TOAK value
+        highCard = getThreeOfAKind();
+        score += highCard * multiplier;
+        multiplier /= 100;
+
+        // add non-TOAK values
+        for(int j=4; j>=0; --j)
+        {
+            currCard = cards[j]%13;
+            if(currCard < 2) currCard += 13;
+
+            if(currCard != highCard)
+            {
+                score += currCard * multiplier;
+                multiplier /= 100;
+            }
+        }
+        break;
+    case TWO_PAIR:
+        // add high pair value
+        highCard = getHighPair();
+        score += highCard * multiplier;
+        multiplier /= 100;
+
+        // add low pair value
+        secondPair = getLowPair();
+        score += secondPair * multiplier;
+        multiplier /= 100;
+
+        // add the non-pair value, it must be card 1, 3 or 5
+        for(int j=4; j>=0; j-=2)
+        {
+            currCard = cards[j]%13;
+            if(currCard < 2) currCard += 13;
+
+            if(currCard != highCard && currCard != secondPair)
+            {
+                score += currCard * multiplier;
+                break;
+            }
+        }
+        break;
+    case ONE_PAIR:
+        // add pair value
+        highCard = getLowPair();
+        score += highCard * multiplier;
+        multiplier /= 100;
+
+        // add non-pair values
+        for(int j=4; j>=0; --j)
+        {
+            currCard = cards[j]%13;
+            if(currCard < 2) currCard += 13;
+
+            if(currCard != highCard)
+            {
+                score += currCard * multiplier;
+                multiplier /= 100;
+            }
+        }
+        break;
+    case FLUSH: // fall through and add high card scores
+    case HIGH_CARD:
+        for(int j=4; j>=0; --j)
+        {
+            highCard = cards[j]%13;
+            if(highCard < 2) highCard += 13;
+
+            score += highCard * multiplier;
+            multiplier /= 100;
+        }
+        break;
     }
 }
 

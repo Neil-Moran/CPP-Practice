@@ -9,6 +9,7 @@ public:
     deck();
     void shuffle();
     void playGame(int numPlayers, int numHands);
+    static std::string calculateResultOld(hand *players, int numPlayers);
     static std::string calculateResult(hand *players, int numPlayers);
     void print();  
 

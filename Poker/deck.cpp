@@ -102,13 +102,20 @@ void deck::playHand(int numPlayers)
     }
 
     // print result
-    std::string result = calculateResult(players, numPlayers);    
+    // std::string result = calculateResultOld(players, numPlayers); 
+    std::string result = calculateResult(players, numPlayers); 
     printf("%s\n", result.c_str());
 
     delete[] players;
 }
 
-std::string deck::calculateResult(hand *players, int numPlayers)
+// keeping this for posterity, cool logic but scoring    
+// the hands seems a much better solution
+// PERF:
+// 100,000 hands of 4 players in 63.83209910 seconds
+// ""            ""               1.20923790 seconds without printf
+// 1,000,000 hands of 10 players in 14.06920920 seconds without printf
+std::string deck::calculateResultOld(hand *players, int numPlayers)
 {
     std::string result;
 
@@ -121,7 +128,7 @@ std::string deck::calculateResult(hand *players, int numPlayers)
     // first find the first instance of the best hand result, ignoring ties
     for(int i=0; i<numPlayers; ++i)
     {
-        if(players[i].result < bestResult)
+        if(players[i].result > bestResult)
         {
             winners = 1 << i;
             winnerID = i;
@@ -134,7 +141,7 @@ std::string deck::calculateResult(hand *players, int numPlayers)
         // then find the player(s) with the best hand
         for(int i=winnerID+1; i<numPlayers; ++i)
         {
-            if(players[i].result < bestResult) // new winner
+            if(players[i].result > bestResult) // new winner
             {
                 winners = 1 << i;
                 winnerID = i;
@@ -250,7 +257,7 @@ std::string deck::calculateResult(hand *players, int numPlayers)
                             break;
                         }
                     }
-                    break;  
+                    break;
                 }
                 if(newWinnerID != -1) // not a tie
                 {
@@ -271,19 +278,17 @@ std::string deck::calculateResult(hand *players, int numPlayers)
 
         if(numWinners == 1) 
         {
-            result = "Player ";
-            result.append(std::to_string(winnerID+1)).append(" Wins");
+            result.append("Player ").append(std::to_string(winnerID+1)).append(" Wins");
         }
         
         else 
         {
             result = "Tie:";
-            for(int i=0; i<numPlayers, numWinners>0; ++i)
+            for(int i=winnerID; i<numPlayers, numWinners>0; ++i)
             {
                 if(winners & 1<<i)
                 {
-                    result.append(" Player ");
-                    result.append(std::to_string(i+1));
+                    result.append(" Player ").append(std::to_string(i+1));
                     --numWinners;
                     if(numWinners > 0) result.append(" |");
                 }
@@ -291,6 +296,51 @@ std::string deck::calculateResult(hand *players, int numPlayers)
         }
 
         return result;
+}
+
+// PERF:
+// 100,000 hands of 4 players in 63.39656060 seconds
+// ""            ""               1.21232670 seconds without printf
+// 1,000,000 hands of 10 players in 13.66677420 seconds without printf
+std::string deck::calculateResult(hand *players, int numPlayers)
+{
+    std::string result;
+
+    int winnerID = 0;   // ID of the winner, initialise to the first player
+    int numWinners = 1; // in the very unlikely event of a tie
+
+    for(int i=1; i<numPlayers; ++i)
+    {
+        if(players[i].score > players[winnerID].score)
+        {
+            winnerID = i;
+            numWinners = 1;
+        }
+        else if(players[i].score == players[winnerID].score)
+        {
+            ++numWinners;
+        }
+    }
+
+    if(numWinners == 1) 
+    {
+        result.append("Player ").append(std::to_string(winnerID+1)).append(" Wins");
+    }
+    else 
+    {
+        result = "Tie:";
+        for(int i=winnerID; i<numPlayers, numWinners>0; ++i)
+        {
+            if(players[i].score == players[winnerID].score)
+            {
+                result.append(" Player ").append(std::to_string(i+1));
+                --numWinners;
+                if(numWinners > 0) result.append(" |");
+            }
+        }
+    }
+
+    return result;
 }
 
 void deck::print()
