@@ -1,22 +1,15 @@
-#include "squirrel3.h"
+#include "RNG.h"
 #include <stdio.h>
 
-void printRandomUInt(int n, const unsigned int seed) //print n random but deterministic uints for the given seed
+void flipCoins(int numFlips)
 {
-    for(int i=0; i<n; ++i)
-    {
-        printf("%u ", (Get1dNoiseUint(i, seed)));
-    }
-    printf("\n");
-}
+    int tailCount = 0, headCount = 0;
 
-void flipCoins(int n)
-{
-    int tailCount =0, headCount = 0;
+    RNG coinFlipRNG;
 
-    for(int i=0; i<n; ++i)
+    for(int i=0; i<numFlips; ++i)
     {
-        switch (flipCoin())
+        switch (coinFlipRNG.flipCoin())
         {
         case false:
             printf("T ");
@@ -32,10 +25,35 @@ void flipCoins(int n)
     printf("\n#Heads: %i | #Tails: %i\n", headCount, tailCount);
 }
 
+void rollChances(double probabilityOfTrue, int numRolls)
+{
+    int passCount = 0, failCount = 0;
+
+    RNG rollChanceRNG;
+
+    for(int i=0; i<numRolls; ++i)
+    {
+        switch (rollChanceRNG.rollRandomChance(probabilityOfTrue))
+        {
+        case false:
+            printf("0 ");
+            ++failCount;
+            break;
+        
+        case true:
+            printf("1 ");
+            ++passCount;
+            break;
+        }
+    }
+    printf("\nP(Pass): %.2f | P(Fail): %.2f\n#Passes: %i | #Fails: %i\n", probabilityOfTrue, (1-probabilityOfTrue), failCount, passCount);
+}
+
 int main()
 {
-    printRandomUInt(1000, 0);
     flipCoins(1000);
+    printf("\n");
+    rollChances(0.75, 1000);
 
     return 0;
 }

@@ -8,6 +8,8 @@ set RELEASE_FLAGS =/O2
 set COMPILER_FLAGS=%COMMON_COMPILER_FLAGS% %DEBUG_FLAGS%
 REM set COMPILER_FLAGS=%COMMON_COMPILER_FLAGS% %RELEASE_FLAGS%
 
+set SRC_FILES=../main.cpp ../RNG.cpp
+
 set LINKER_FLAGS=/INCREMENTAL:NO /opt:ref
 REM set SYSTEM_LIBS=user32.lib gdi32.lib winmm.lib d3d11.lib
 
@@ -15,7 +17,7 @@ set BUILD_DIR=".\build"
 if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
 
-cl %COMPILER_FLAGS% ../main.cpp /link %LINKER_FLAGS% %SYSTEM_LIBS%
+cl %COMPILER_FLAGS% %SRC_FILES% /link %LINKER_FLAGS% %SYSTEM_LIBS%
 
 popd
 echo Done
