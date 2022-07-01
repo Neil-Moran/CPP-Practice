@@ -11,23 +11,42 @@ RNG::RNG()
 
 bool RNG::flipCoin()
 {
-    double flip = (double)(Get1dNoiseUint())/(4294967295); // random value between 0 and 1
-    ++position;
-
-    if(flip < 0.5) return false;
-    else return true;
+    // NB: DO NOT update position, rollRandomChance already does
+    return rollRandomChance(0.5);
 }
 
 bool RNG::rollRandomChance(double probabilityOfTrue)
 {
-    double roll = (double)(Get1dNoiseUint())/(4294967295); // random value between 0 and 1
+    double roll = (double)(get1dNoiseUint())/(UINT32_MAX); // random value between 0 and 1
     ++position;
 
     if(roll < probabilityOfTrue) return false;
     else return true;
 }
 
-unsigned int RNG::Get1dNoiseUint()
+unsigned int RNG::rollDie()
+{
+    // NB: DO NOT update position, rollRandomIntLessThan already does
+    return rollRandomIntLessThan(6) + 1;
+}
+
+unsigned int RNG::rollRandomIntLessThan(unsigned int maxValueNotInclusive)
+{
+    double randomInt = (double)(get1dNoiseUint())/(UINT32_MAX) * maxValueNotInclusive; // random value between 0 and max value
+    ++position;
+
+    return (unsigned int) randomInt;
+}
+
+int RNG::rollRandomIntBetween(int minValueInclusive, int maxValueInclusive)
+{
+    // NB: DO NOT update position, rollRandomIntLessThan already does
+    unsigned int randomInt = rollRandomIntLessThan(maxValueInclusive - minValueInclusive + 1);
+
+    return randomInt + minValueInclusive;
+}
+
+unsigned int RNG::get1dNoiseUint()
 {
     /* implementation of the Squirrel3 noise/RNG algorithm created by Squirrel Eiserloh:
     http://www.eiserloh.net/bio/
