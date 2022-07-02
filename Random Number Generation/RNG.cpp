@@ -20,8 +20,8 @@ bool RNG::rollRandomChance(double probabilityOfTrue)
     double roll = (double)(get1dNoiseUint())/(UINT32_MAX); // random value between 0 and 1
     ++position;
 
-    if(roll < probabilityOfTrue) return false;
-    else return true;
+    if(roll <= probabilityOfTrue) return true;
+    else return false;
 }
 
 unsigned int RNG::rollDie()

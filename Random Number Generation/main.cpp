@@ -9,17 +9,15 @@ void flipCoins(int numFlips)
 
     for(int i=0; i<numFlips; ++i)
     {
-        switch (coinFlipRNG.flipCoin())
+        if(coinFlipRNG.flipCoin())
         {
-        case false:
-            printf("T ");
-            ++tailCount;
-            break;
-        
-        case true:
             printf("H ");
             ++headCount;
-            break;
+        }
+        else
+        {          
+            printf("T ");
+            ++tailCount;
         }
     }
     printf("\n#Heads: %i | #Tails: %i\n", headCount, tailCount);
@@ -33,20 +31,18 @@ void rollChances(double probabilityOfTrue, int numRolls)
 
     for(int i=0; i<numRolls; ++i)
     {
-        switch (rollChanceRNG.rollRandomChance(probabilityOfTrue))
+        if(rollChanceRNG.rollRandomChance(probabilityOfTrue))
         {
-        case false:
-            printf("0 ");
-            ++failCount;
-            break;
-        
-        case true:
             printf("1 ");
             ++passCount;
-            break;
         }
+        else
+        {
+            printf("0 ");
+            ++failCount;
+        }        
     }
-    printf("\nP(Pass): %.2f | P(Fail): %.2f\n#Passes: %i | #Fails: %i\n", probabilityOfTrue, (1-probabilityOfTrue), failCount, passCount);
+    printf("\nP(Pass): %.2f | P(Fail): %.2f\n#Passes: %i | #Fails: %i\n", probabilityOfTrue, (1-probabilityOfTrue), passCount, failCount);
 }
 
 void rollIntsLessThan(unsigned int maxValue, int numRolls)
