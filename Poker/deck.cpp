@@ -8,28 +8,35 @@
 #include <stdio.h>
 #include <string>
 
-deck::deck()
+deck::deck(int numPacks)
 {   
+    numCards = numPacks*52;
     countCardsDrawn = 0;
+    cards = new int[numCards];
 
-    for(int i=0; i<52; ++i)
+    for(int i=0; i<numCards; ++i)
     {
-        cards[i] = i+1;
+        cards[i] = i%52+1;
     }
+}
+
+deck::~deck()
+{
+    delete[] cards;
 }
 
 void deck::riffleShuffle()
 {
-    int cards_copy[52];
-    memcpy(cards_copy, cards, sizeof(cards));
+    int *cards_copy = new int[numCards];
+    memcpy(cards_copy, cards, numCards*sizeof(int));
 
     RNG rng;
 
     // simulated riffle shuffle: split the deck in half, then 
     // randomly add cards back into the deck from both halves
-    int i=0, l=0, r=26;
+    int i=0, l=0, r=numCards/2;
 
-    while(l<26 && r<52)
+    while(l<numCards/2 && r<numCards)
     {
         if(rng.flipCoin()) // flip a coin; if tails we take a card from the left packet...
         {
@@ -47,17 +54,17 @@ void deck::riffleShuffle()
     }
 
     // we've exhausted one of the packets, finish off the cards from the remaining packet
-    if(l<26)
+    if(l<numCards/2)
     {
-        while(l<26)
+        while(l<numCards/2)
         {
             cards[i++] = cards_copy[l++];
         }
     }
 
-    if(r<52)
+    if(r<numCards)
     {
-        while(r<52)
+        while(r<numCards)
         {
             cards[i++] = cards_copy[r++];
         }
@@ -89,7 +96,7 @@ void deck::playGame(int numPlayers, int numHands)
 
 void deck::playHand(int numPlayers)
 {
-    if(numPlayers > 10) numPlayers = 10;
+    if(numPlayers > numCards/5) numPlayers = numCards/5; // max numPlayers is numCards/5, as everyone needs 5 cards
 
     hand *players = new hand[numPlayers];
 
@@ -346,7 +353,7 @@ std::string deck::calculateResult(hand *players, int numPlayers)
 void deck::print()
 {
     std::string result;
-    for(int i=0; i<52; ++i)
+    for(int i=0; i<numCards; ++i)
     {
         result.append(getCardValue(cards[i]).append(" "));
         if((i+1)%13 == 0) result.append("\n");

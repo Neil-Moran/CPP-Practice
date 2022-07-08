@@ -6,7 +6,8 @@ class deck
     friend class hand;
 
 public:
-    deck();
+    deck(int numPacks = 1);
+    ~deck();
     void shuffle();
     void playGame(int numPlayers, int numHands);
     static std::string calculateResultOld(hand *players, int numPlayers);
@@ -14,7 +15,8 @@ public:
     void print();  
 
 private:
-    int cards[52];
+    int* cards;
+    int numCards;
     int countCardsDrawn;
 
     void riffleShuffle();
