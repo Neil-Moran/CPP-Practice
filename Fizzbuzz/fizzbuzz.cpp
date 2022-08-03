@@ -1,6 +1,6 @@
 #include "fizzbuzz.h"
+#include "timing.h"
 #include <assert.h>
-#include <chrono>
 #include <stdio.h>
 
 const int FIZZ = 3;
@@ -24,7 +24,7 @@ void fizzbuzz(int n) //print the first n terms of fizzbuzz
 void fizzbuzz(int n, char *filename) //write the first n terms of fizzbuzz to the specified file
 {
     FILE *file;
-    fopen_s(&file, filename, "w+"); 
+    fopen_s(&file, filename, "w+");
 
     for(int i=1; i<=n; ++i)
     {
@@ -41,16 +41,14 @@ void fizzbuzz(int n, char *filename) //write the first n terms of fizzbuzz to th
 
 void profileFizzbuzz() //write a large number of terms of fizzbuzz to a file using modulo operator and time it
 {
-    using namespace std::chrono;
     const int n = 1000000;
-    high_resolution_clock::time_point start = high_resolution_clock::now();  
+    printf("Writing %d terms of Fizzbuzz using modulo operator\n", n);
 
-    fizzbuzz(n, "profileFizzbuzz.txt");
+    {
+        Timer timer;
+        fizzbuzz(n, "profileFizzbuzz.txt");
+    } // destroy timer
 
-    high_resolution_clock::time_point end = high_resolution_clock::now();
-    nanoseconds elapsed = duration_cast<nanoseconds>(end - start);
-
-    printf("Wrote %d terms of Fizzbuzz using modulo operator in %.8f seconds\n", n, elapsed.count() * 1e-9);
     bool fileRemoved = remove("profileFizzbuzz.txt");
     assert(fileRemoved == 0);
 }
@@ -136,16 +134,14 @@ void fizzbuzzNoModulo(int n, char *filename) //write the first n terms of fizzbu
 
 void profileFizzbuzzNoModulo() //write a large number terms of fizzbuzz to a file without using modulo operator and time it
 {
-    using namespace std::chrono;
     const int n = 1000000;
-    high_resolution_clock::time_point start = high_resolution_clock::now();
+    printf("Writing %d terms of Fizzbuzz without using modulo operator\n", n);
 
-    fizzbuzzNoModulo(n, "profileFizzbuzz.txt");
+    {
+        Timer timer;
+        fizzbuzzNoModulo(n, "profileFizzbuzz.txt");    
+    } // destroy timer
 
-    high_resolution_clock::time_point end = high_resolution_clock::now();
-    nanoseconds elapsed = duration_cast<nanoseconds>(end - start);
-
-    printf("Wrote %d terms of Fizzbuzz without using modulo operator in %.8f seconds\n", n, elapsed.count() * 1e-9);
     bool fileRemoved = remove("profileFizzbuzz.txt");
     assert(fileRemoved == 0);
 }
