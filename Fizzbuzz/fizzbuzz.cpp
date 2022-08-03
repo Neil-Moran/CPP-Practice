@@ -1,3 +1,4 @@
+#include "fizzbuzz.h"
 #include <assert.h>
 #include <chrono>
 #include <stdio.h>
@@ -65,15 +66,28 @@ void fizzbuzzNoModulo(int n) //print the first n terms of fizzbuzz without the m
         --buzzCount;
         
         if(fizzCount == 0)
-            printf("Fizz"); //we can't reset the fizz counter yet, we do it below
-        if(buzzCount == 0)
+        {
+            if(buzzCount == 0)
+            {
+                printf("FizzBuzz");
+                fizzCount = FIZZ;
+                buzzCount = BUZZ;
+            }
+            else
+            {
+                printf("Fizz"); 
+                fizzCount = FIZZ;
+            }
+        }
+        else if(buzzCount == 0)
         {
             printf("Buzz");
             buzzCount = BUZZ;
         }
-        else if(fizzCount != 0)
+        else 
+        {
             printf("%d", i);
-        else fizzCount = FIZZ; //now reset fizz counter
+        }
         printf(" ");        
     }
     printf("\n\n");
@@ -91,17 +105,30 @@ void fizzbuzzNoModulo(int n, char *filename) //write the first n terms of fizzbu
     {
         --fizzCount;
         --buzzCount;
-        
+
         if(fizzCount == 0)
-            fprintf(file, "Fizz"); //we can't reset the fizz counter yet, we do it below
-        if(buzzCount == 0)
+        {
+            if(buzzCount == 0)
+            {
+                fprintf(file, "FizzBuzz");
+                fizzCount = FIZZ;
+                buzzCount = BUZZ;
+            }
+            else
+            {
+                fprintf(file, "Fizz");
+                fizzCount = FIZZ;
+            }
+        }
+        else if(buzzCount == 0)
         {
             fprintf(file, "Buzz");
             buzzCount = BUZZ;
         }
-        else if(fizzCount != 0)
+        else 
+        {
             fprintf(file, "%d", i);
-        else fizzCount = FIZZ; //now reset fizz counter
+        }
         fprintf(file, " ");        
     }
     fclose(file);

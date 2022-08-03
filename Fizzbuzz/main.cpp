@@ -1,4 +1,4 @@
-#include "fizzbuzz.cpp"
+#include "fizzbuzz.h"
 
 void main()
 {
