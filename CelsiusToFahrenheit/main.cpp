@@ -23,5 +23,7 @@ int main()
         printf("%.2f Celsius = %.2f Fahrenheit!\n", celValues[i], t_fahr);
     }
 
+    fclose(inputFile);
+
     return 0;
 }
