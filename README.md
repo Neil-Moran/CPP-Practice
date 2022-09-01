@@ -5,7 +5,7 @@ This repo contains several simple C++ projects intended to help me practice my p
 ## Building the source code
 I develop using Visual Studio Code, so each sub-project contains:
 * a `build.bat` batch file that calls the Microsoft compiler
-* a `.vscode` containing JSON files to build and run the program from VS Code
+* a `.vscode` folder containing JSON files to build and run the program from VS Code
 
 If you want to build a sub-project using another compiler it should hopefully be straight-forward, there are only a few files per project and the compiler arguments are simple enough!
 
