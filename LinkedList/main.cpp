@@ -52,6 +52,8 @@ void addFromFile(LinkedList &list, char *filename)
         fscanf_s(file, "%d", &v);
         list += new Node(v);
     }
+
+    fclose(file);
 }
 
 void insertFromFile(LinkedList &list, char *filename)
@@ -69,6 +71,8 @@ void insertFromFile(LinkedList &list, char *filename)
         fscanf_s(file, "%d", &v);
         list.insert(new Node(v));
     }
+
+    fclose(file);
 }
 
 void find(LinkedList &list, int value)
