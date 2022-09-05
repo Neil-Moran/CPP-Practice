@@ -76,7 +76,7 @@ int Node::calcDepthRecursive(int currentDepth = 1)
 Node* Node::balanceRecursive(Node *parent)
 {
     //returns a pointer to the new root node, or 0 if on a child branch
-    printf("%d ", value);
+    //printf("%d ", value); //for debugging
     
     Node *root = 0;
     
@@ -256,6 +256,7 @@ void BinaryTree::remove(int value)
 };
 
 int BinaryTree::calcDepth()
+const
 {   
     if(root == 0)
         return 0;

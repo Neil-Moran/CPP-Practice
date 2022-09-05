@@ -29,7 +29,7 @@ struct BinaryTree
     void add(Node *n);
     void find(int target);
     void remove(int value);
-    int calcDepth();
+    int calcDepth() const;
     void balance();
     void print();
     void printAsTree();

@@ -2,7 +2,7 @@
 #include "BinaryTree.h"
 
 void addFromFile(BinaryTree &tree, char *filename);
-void printDepth(BinaryTree &tree);
+void printDepth(const BinaryTree &tree);
 
 int main()
 {
@@ -55,7 +55,7 @@ void addFromFile(BinaryTree &tree, char *filename)
     fclose(file);
 }
 
-void printDepth(BinaryTree &tree)
+void printDepth(const BinaryTree &tree)
 {
     printf("Tree Depth: ");
 
