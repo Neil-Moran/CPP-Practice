@@ -51,6 +51,8 @@ void addFromFile(BinaryTree &tree, char *filename)
         fscanf_s(file, "%d", &v);
         tree.add(new Node(v));
     }
+
+    fclose(file);
 }
 
 void printDepth(BinaryTree &tree)
