@@ -11,7 +11,6 @@ struct Node
     int value;  
     Node *left, *right;
     
-    int getValue();
     void add(Node *n);
     int findRecursive(int target, int depth);
     int calcDepthRecursive(int currentDepth);

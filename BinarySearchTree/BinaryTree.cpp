@@ -19,11 +19,6 @@ Node::~Node()
     printf("Destroying Node: %d\n", value);
 };
 
-int Node::getValue()
-{
-    return value;
-};
-
 void Node::add(Node *n)
 {
     if(n->value < value)
