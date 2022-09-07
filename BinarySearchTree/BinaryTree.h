@@ -12,11 +12,11 @@ struct Node
     Node *left, *right;
     
     void add(Node *n);
-    int findRecursive(int target, int depth);
+    int findRecursive(int target, int currentDepth);
     int calcDepthRecursive(int currentDepth);
     Node* balanceRecursive(Node *parent);
     void printRecursive();
-    void printTree(int depth);
+    void printTree(int currentDepth);
 };
 
 struct BinaryTree
