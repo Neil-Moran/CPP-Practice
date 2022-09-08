@@ -198,17 +198,28 @@ void BinaryTree::remove(int value)
 
     if(root->value == value) //remove root
     {
-        //make right new root and add left to it (could also do vice versa)
-        Node *rootNew = root->right;
-        rootNew->add(root->left);
+        Node *rootNew = 0; //we need a new root, either of the children if they aren't null
+
+        if(root->right != 0) //make right new root and add left to it 
+        {
+            rootNew = root->right;
+            if(root->left != 0) rootNew->add(root->left);
+        }
+
+        else if(root->left != 0) //make left new root and add right to it 
+        {
+            rootNew = root->left;
+            if(root->right != 0) rootNew->add(root->right);
+        }
+
+        //...else root has no children, tree will be empty
 
         //disconnect and delete root
         root->left = 0;
         root->right = 0;
         delete root;
 
-        //assign new root
-        root = rootNew;
+        root = rootNew; //assign new root (could be null)
         return;
     }
 
