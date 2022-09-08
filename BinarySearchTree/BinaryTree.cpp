@@ -238,8 +238,8 @@ void BinaryTree::remove(int value)
                 parent->right = 0;
 
             //add both children to parent, order doesn't matter
-            parent->add(curr->right);
-            parent->add(curr->left);
+            if(curr->right != 0) parent->add(curr->right);
+            if(curr->left != 0) parent->add(curr->left);
 
             //disconnect and delete curr
             curr->right = 0;
