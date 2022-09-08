@@ -1,0 +1,16 @@
+# Binary Search Tree
+A basic implementation of a binary search tree of nodes, each containing a single integer value. A lot more challenging than the [Linked List](https://github.com/Neil-Moran/CPP-Practice/tree/main/LinkedList) project, but a lot more fun too! Plenty of cool features, I really liked all the work with pointers and recursion for this one.
+
+## Printing the Tree
+There are two print methods for this project. The first prints the values in the tree in the correct order, it's really elegant and satisfying that that only takes 5 lines! 
+
+The second was more challenging; printing a representation of the tree structure. I wanted to try this for fun but it proved crucial for debugging some of the other features that were altering the tree's structure. I find these kinds of data structures tricky to inspect through the debugger, so being able to print a visual aid at any stage in an algorithm was a lifesaver. I looked online to find an idea of what the output should look like, it hadn't occurred to me to print the branches going horizontally instead of vertically. I spent far too long on the formatting trying to make it pretty, but the only use for this in the real world is debugging so Good Enough is Good Enough (TM). The code itself is really ugly, but that seems mostly unavoidable I think. I could have sped it up by writing all the text to a string and calling a single printf() but I never had an issue with the performance.
+
+## Calculating the Tree Depth
+Just to note that the consensus on the internet disagrees with my code here; what I call tree depth they call height, and while I decided that a tree with one node has a depth of 1 they say it has a height of 0. This would be pretty easy to change but I've left it my way for now! This was handy to get working, I think it's cool how you recursively pass the current depth through to the next node!
+
+## Remove
+ This method wasn't too bad, but I had never done it before. One valuable lesson I learned in college was to draw a picture for tricky problems, and it was invaluable here to grasp what had to happen at every step in the process. When it came to writing the code a step-by-step approach was vital; I first got the case for removing the root working, which was a decent base for the rest of the algorithm. While writing this I spotted a couple of bugs where I was referencing left and right without null-checking them, something to remember going forward!!
+
+## Balancing the Tree
+I think I remember one slide of a lecture in college talking about rebalancing a binary tree, but we never implemented it ourselves there. Maybe that was good judgement on the lecturer's part, this took a lot of trial and error to get right! But I was determined to finally do this myself. :D This would have been way harder if I hadn't written the remove code beforehand, and even still I had to research how exactly to restructure the tree to balance it. Lots of drawings and blank stares at the debugger ensued, and as mentioned above regularly printing out the tree structure to see where it was being messed up was vital. Rereading the code makes me think I'll have to rewrite this again some day for practice, it's still hard to wrap my head around! Very satisfying to get it done at least. :)
