@@ -156,7 +156,7 @@ bool isValid(int grid[]) // checks that the grid does not violate Sudoku constra
                     
             for(int k=0; k<21; ++k)
             {
-                // skip to next row of the square if necessary
+                // skip to next row of the box if necessary
                 if(k==3) k = 9;
                 if(k==12) k = 18;                
 
@@ -203,6 +203,27 @@ bool isValid(int grid[]) // checks that the grid does not violate Sudoku constra
     return true; // grid is valid if we made it here
 }
 
+bool bruteForceSolve(int grid[], int index) // recursively try every value from 1 to 9 at the specified index and every empty cell onwards
+{
+    // note: assumes the grid is a proper Sudoku, i.e. there is only one solution
+    for(int i=1; i<=9; ++i)
+    {
+        grid[index] = i;
+
+        if(!isValid(grid)) continue; // if this value is not valid, continue to the next one
+
+        //find the next empty cell
+        int nextIndex = index + 1;
+        while(nextIndex <= 81 && grid[nextIndex] != 0) ++nextIndex;
+
+        if(nextIndex > 81 || bruteForceSolve(grid, nextIndex)) return true; // if all empty cells have been or can be filled, this value for grid[index] is correct!
+    }
+
+    // if no value from 1-9 is valid in this cell then the solution up to now is wrong
+    grid[index] = 0; // remove the incorrect value, we'll try setting it again in another recursion
+    return false; 
+}
+
 void solve(char *fileIn, char *fileOut)
 {
     FILE *input;
@@ -215,42 +236,48 @@ void solve(char *fileIn, char *fileOut)
         fscanf_s(input, "%d", &grid[i]);
     }
 
-    print(grid);
+    fclose(input);
 
     if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
-        {
-            FILE *output;
-            fopen_s(&output, fileOut, "w+");
-            fprintf(output, 
-            "Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or square.");
-            fclose(output);
-            return;
-        }
-
-    bool completed = false; // completed either means the Sudoku is solved or our algorithm cannot solve it any further
-
-    while(!completed)
     {
-        completed = true;        
-        
+        FILE *output;
+        fopen_s(&output, fileOut, "w+");
+        fprintf(output, 
+        "Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
+        fclose(output);
+        return;
     }
 
-    fclose(input);
+    // find the first empty cell
+    int index = 0;
+    while(index <= 81 && grid[index] != 0) ++index;
+
+    bool solved;
+
+    if(index > 81) solved = true; // already solved?!
+    else solved = bruteForceSolve(grid, index);
 
     // write result to output file
     FILE *output;
     fopen_s(&output, fileOut, "w+");
 
-    for(int i=0, j=0; i<81; ++i, ++j)
+    if(!solved) 
+        fprintf(output, 
+        "Could not solve the specified grid as no solution exists.");
+
+    else 
     {
-        if(j == 9) // print a new line every row (9 values)
+        for(int i=0, j=0; i<81; ++i, ++j)
         {
-            fprintf(output, "\n");
-            j = 0;
+            if(j == 9) // print a new line every row (9 values)
+            {
+                fprintf(output, "\n");
+                j = 0;
+            }
+
+            fprintf(output, "%d ", grid[i]);
         }
-
-        fprintf(output, "%d ", grid[i]);
     }
-
+    
     fclose(output);
 }

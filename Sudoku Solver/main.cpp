@@ -3,6 +3,8 @@
 
 int main()
 {
-    solve("test_input_1_invalid", "test_output_1_invalid");
+    solve("test_input_1_invalid.txt", "test_output_1_invalid.txt");
+    solve("test_input_2_solvable.txt", "test_output_2_solvable.txt");
+    solve("test_input_3_unsolvable.txt", "test_output_3_unsolvable.txt");
     return 0;
 }

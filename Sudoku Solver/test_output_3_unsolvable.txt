@@ -1,0 +1,1 @@
+Could not solve the specified grid as no solution exists.
