@@ -3,6 +3,6 @@
 
 int main()
 {
-    solve("test_input_1", "test_output_1");
+    solve("test_input_1_invalid", "test_output_1_invalid");
     return 0;
 }
