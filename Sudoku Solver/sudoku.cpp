@@ -129,9 +129,10 @@ bool isValid(int grid[]) // checks that the grid does not violate Sudoku constra
             }
         }
 
-        if(countOnes > 1 || countTwos > 1 || countThrees > 1
-            || countFours > 1 || countFives > 1 || countSixes > 1
-            || countSevens > 1 || countEights > 1 || countNines > 1) return false;
+        // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+        if((countOnes | countTwos | countThrees
+            | countFours | countFives | countSixes
+            | countSevens | countEights | countNines) > 1) return false;
     }
 
     /* --- CHECK BOXES ARE VALID --- */
@@ -203,18 +204,112 @@ bool isValid(int grid[]) // checks that the grid does not violate Sudoku constra
     return true; // grid is valid if we made it here
 }
 
+bool isRegionValid(int grid[], int region[]) // checks that specified region of the grid does not violate Sudoku constraints, but does not check for solvability
+{
+    // the region variable is a list of 9 indices referring to a specific region (row, column or box) in the grid
+    // we will verify no number appears more than once in the region
+    int countOnes = 0, countTwos = 0, countThrees = 0, countFours = 0, countFives = 0, countSixes = 0, countSevens = 0, countEights = 0, countNines = 0;
+
+    for(int i=0; i<9; ++i)
+    {
+        switch (grid[region[i]])
+            {
+            case 1:
+                ++countOnes;
+                break;
+            case 2:
+                ++countTwos;
+                break;
+            case 3:
+                ++countThrees;
+                break;
+            case 4:
+                ++countFours;
+                break;
+            case 5:
+                ++countFives;
+                break;
+            case 6:
+                ++countSixes;
+                break;
+            case 7:
+                ++countSevens;
+                break;
+            case 8:
+                ++countEights;
+                break;
+            case 9:
+                ++countNines;
+                break;            
+            default: // 0 or junk value
+                break;
+            }
+    }
+
+    // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+    if((countOnes | countTwos | countThrees
+        | countFours | countFives | countSixes 
+        | countSevens | countEights | countNines) > 1) return false;
+
+    else return true;
+}
+
 bool bruteForceSolve(int grid[], int index = 0) // recursively try every value from 1 to 9 at the specified index and every empty cell onwards
 // note: assumes the grid is a proper Sudoku, i.e. there is only one solution
 {  
+    // hard code the co-ordinates of all regions (row, column or box)
+    // 0-8: rows
+    // 9-17: columns
+    // 18-26: boxes
+    static int regions[27][9] = {
+        {0, 1, 2, 3, 4, 5, 6, 7, 8},
+        {9, 10, 11, 12, 13, 14, 15, 16, 17},
+        {18, 19, 20, 21, 22, 23, 24, 25, 26},
+        {27, 28, 29, 30, 31, 32, 33, 34, 35},
+        {36, 37, 38, 39, 40, 41, 42, 43, 44},
+        {45, 46, 47, 48, 49, 50, 51, 52, 53},
+        {54, 55, 56, 57, 58, 59, 60, 61, 62},
+        {63, 64, 65, 66, 67, 68, 69, 70, 71},
+        {72, 73, 74, 75, 76, 77, 78, 79, 80},
+        {0, 9, 18, 27, 36, 45, 54, 63, 72},
+        {1, 10, 19, 28, 37, 46, 55, 64, 73},
+        {2, 11, 20, 29, 38, 47, 56, 65, 74},
+        {3, 12, 21, 30, 39, 48, 57, 66, 75},
+        {4, 13, 22, 31, 40, 49, 58, 67, 76},
+        {5, 14, 23, 32, 41, 50, 59, 68, 77},
+        {6, 15, 24, 33, 42, 51, 60, 69, 78},
+        {7, 16, 25, 34, 43, 52, 61, 70, 79},
+        {8, 17, 26, 35, 44, 53, 62, 71, 80},
+        {0, 1, 2, 9, 10, 11, 18, 19, 20},
+        {3, 4, 5, 12, 13, 14, 21, 22, 23},
+        {6, 7, 8, 15, 16, 17, 24, 25, 26},
+        {27, 28, 29, 36, 37, 38, 45, 46, 47},
+        {30, 31, 32, 39, 40, 41, 48, 49, 50},
+        {33, 34, 35, 42, 43, 44, 51, 52, 53},
+        {54, 55, 56, 63, 64, 65, 72, 73, 74},
+        {57, 58, 59, 66, 67, 68, 75, 76, 77},
+        {60, 61, 62, 69, 70, 71, 78, 79, 80}
+    }; 
+
     while(index <= 81 && grid[index] != 0) ++index; //find the next empty cell
 
     if(index > 81) return true; // if we've filled all cells then this solution is correct!
-
+    
     for(int i=1; i<=9; ++i)
     {
         grid[index] = i;
 
-        if(!isValid(grid)) continue; // if this value is not valid, continue to the next one
+        // we don't need to check that the entire grid is still valid; 
+        // only the regions containing the index cell
+        // if not we continue to the next value for i
+        if(!isRegionValid(grid, regions[index/9])) continue; // check row is valid
+        if(!isRegionValid(grid, regions[9 + (index%9)])) continue; // check column is valid
+        // finding the box co-ord looks ugly but is intuitive; 
+        // box row (from 0-2) = row/3
+        // box column (from 0-2) = column/3
+        // box co-ord (from 0-9) = 3*box row + box column
+        // NB: 3*row/3 != row as it is an integer and gets rounded down when divided!
+        if(!isRegionValid(grid, regions[18 + ((3*(index/27)) + ((index%9)/3))])) continue; // check box is valid
 
         if(bruteForceSolve(grid, index + 1)) return true; // if all other empty cells can be filled, this value for grid[index] is correct!
     }
@@ -316,12 +411,42 @@ void solveNextNumber(char *fileIn, char *fileOut) // solves a single cell in the
         return;
     }
 
-    // find the co-ordinates of all regions (a region is a row, column or box)
-    // e.g. the first row has co-ordinates 0 1 2 3 4 5 6 7 8
-    // the first column has co-ordinates 0 9 18 27 36 45 54 63 72
-    // the first box has co-ordinates 0 1 2 9 10 11 18 19 20
-    int regions[27][9]; 
-
+    // hard code the co-ordinates of all regions (row, column or box)
+    // 0-8: rows
+    // 9-17: columns
+    // 18-26: boxes
+    int regions[27][9] = {
+        {0, 1, 2, 3, 4, 5, 6, 7, 8},
+        {9, 10, 11, 12, 13, 14, 15, 16, 17},
+        {18, 19, 20, 21, 22, 23, 24, 25, 26},
+        {27, 28, 29, 30, 31, 32, 33, 34, 35},
+        {36, 37, 38, 39, 40, 41, 42, 43, 44},
+        {45, 46, 47, 48, 49, 50, 51, 52, 53},
+        {54, 55, 56, 57, 58, 59, 60, 61, 62},
+        {63, 64, 65, 66, 67, 68, 69, 70, 71},
+        {72, 73, 74, 75, 76, 77, 78, 79, 80},
+        {0, 9, 18, 27, 36, 45, 54, 63, 72},
+        {1, 10, 19, 28, 37, 46, 55, 64, 73},
+        {2, 11, 20, 29, 38, 47, 56, 65, 74},
+        {3, 12, 21, 30, 39, 48, 57, 66, 75},
+        {4, 13, 22, 31, 40, 49, 58, 67, 76},
+        {5, 14, 23, 32, 41, 50, 59, 68, 77},
+        {6, 15, 24, 33, 42, 51, 60, 69, 78},
+        {7, 16, 25, 34, 43, 52, 61, 70, 79},
+        {8, 17, 26, 35, 44, 53, 62, 71, 80},
+        {0, 1, 2, 9, 10, 11, 18, 19, 20},
+        {3, 4, 5, 12, 13, 14, 21, 22, 23},
+        {6, 7, 8, 15, 16, 17, 24, 25, 26},
+        {27, 28, 29, 36, 37, 38, 45, 46, 47},
+        {30, 31, 32, 39, 40, 41, 48, 49, 50},
+        {33, 34, 35, 42, 43, 44, 51, 52, 53},
+        {54, 55, 56, 63, 64, 65, 72, 73, 74},
+        {57, 58, 59, 66, 67, 68, 75, 76, 77},
+        {60, 61, 62, 69, 70, 71, 78, 79, 80}
+    }; 
+    
+    // derivation of regions:
+    /*
     for(int i=0; i<9; ++i)
     {
         for(int j=0; j<9; ++j)
@@ -342,4 +467,6 @@ void solveNextNumber(char *fileIn, char *fileOut) // solves a single cell in the
             regions[18+i][j] = 3*k + l; //co-ordinates for boxes
         }
     }
+    */
+    
 }
