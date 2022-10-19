@@ -64,6 +64,21 @@ static int regions[27][9] = {
     */
 };
 
+inline int getRow(int cell) // returns the row of the specified cell
+{
+    return cell/9;
+}
+
+inline int getColumn(int cell) // returns the column of the specified cell
+{
+    return 9 + (cell%9);
+}
+
+inline int getBox(int cell) // returns the box of the specified cell
+{
+    return 18 + (3*(cell/27)) + ((cell%9)/3);
+}
+
 void print(int grid[]) // print the current state of the grid, for testing
 {
     for(int i=0, j=0; i<81; ++i, ++j)
@@ -373,16 +388,16 @@ void writeGridToFile(char *file, int grid[]) // writes the values from the grid 
     fopen_s(&output, file, "w+");
 
     for(int i=0, j=0; i<81; ++i, ++j)
+    {
+        if(j == 9) // print a new line every row (9 values)
         {
-            if(j == 9) // print a new line every row (9 values)
-            {
-                fprintf(output, "\n");
-                j = 0;
-            }
-            
-            if(grid[i] == 0) fprintf(output, "_ ");
-            else fprintf(output, "%d ", grid[i]);
+            fprintf(output, "\n");
+            j = 0;
         }
+        
+        if(grid[i] == 0) fprintf(output, "_ ");
+        else fprintf(output, "%d ", grid[i]);
+    }
 
     fclose(output);
 }
@@ -456,6 +471,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
     
     for(int numLoops = 0; numLoops <= countToSolve; ++numLoops) // if we don't solve at least one number every iteration (after the first initialisation pass), the grid is unsolvable
     {
+        printf("Starting Loop %i\n", numLoops);
         // check possible values for every empty cell
         for(int currCell=0; currCell<81; ++currCell)
         {
@@ -470,12 +486,14 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                 if(!isCellValid(grid, currCell)) // if grid is now invalid remove possible value for this cell
                     possibleValues[currCell] &= ~(1 << value); 
             }
+            if(possibleValues[currCell] == 0)
+                printf("Made a mistake! \n"); 
 
             if((possibleValues[currCell] & (possibleValues[currCell] - 1)) == 0) // if possible value is a power of 2 there is only one possible value
             {
                 // find the correct value
                 int value = 1;
-                while((possibleValues[currCell] >> value) != 1) 
+                while((possibleValues[currCell] >> value) != 1 && value <= 9) 
                     ++value;
 
                 grid[currCell] = value;
@@ -490,13 +508,17 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                 if(countSolved == countToSolve) return; // stop if we've solved enough cells, continue otherwise
 
                 // we now know that value cannot go anywhere in the three regions containing the current cell; clear the appropriate bit for those cells
+                int row = getRow(currCell);
+                int column = getColumn(currCell);
+                int box = getBox(currCell);
+
                 for(int i=0; i<9; ++i)
                 {
-                    possibleValues[regions[currCell/9][i]] &= ~(1 << value); // row
-                    possibleValues[regions[9 + (currCell%9)][i]] &= ~(1 << value); //column
-                    possibleValues[regions[18 + (3*(currCell/27)) + ((currCell%9)/3)][i]] &= ~(1 << value); // box
+                    possibleValues[regions[row][i]] &= ~(1 << value); // row
+                    possibleValues[regions[column][i]] &= ~(1 << value); //column
+                    possibleValues[regions[box][i]] &= ~(1 << value); // box
                 }
-                Sleep(1000);
+                Sleep(300);
             }
 
             else grid[currCell] = 0; // else reset cell to empty
@@ -507,46 +529,150 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
         {
             for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this region
             {
-                int targetCell = -999;
+                int countCandidates = 0; // number of candidate cells where value could go
+                int cell1 = -999, cell2 = -999, cell3 = -999;
+
                 for(int currCell=0; currCell<9; ++currCell)
                 {
-                    if((possibleValues[regions[currRegion][currCell]] & (1 << value)) > 0)
-                    {
-                        if(targetCell == -999) // if this is the first target cell, remember it
+                    if((possibleValues[regions[currRegion][currCell]] & (1 << value)) > 0) // value can go in currCell
+                    {   
+                        switch (countCandidates++) // note the increment
                         {
-                            targetCell = currCell;
-                        }
-                        else // if there is more than one target cell, we don't know where value goes
-                        {
-                            targetCell = -1;
-                            break; // continue to the next value
+                        case 0: // first candidate
+                            cell1 = currCell;
+                            break;
+                        // if there is more than one candidate cell, we don't know where value goes 
+                        // but we may have new info if there are only 2 or 3
+                        case 1: // second candidate
+                            cell2 = currCell;
+                            break;
+                        case 2: // third candidate
+                            cell3 = currCell;
+                            break;                        
+                        // if there are more than 3 then no possible info, continue to next value
+                        default: currCell = 10; // this will terminate the for loop                            
                         }
                     }
                 }
-                if(targetCell > 0) // found where value goes
+                switch(countCandidates)
                 {
-                    int cell = regions[currRegion][targetCell];
-                    grid[cell] = value;
-                    possibleValues[cell] = 0;
-
-                    if(!isCellValid(grid, cell)) 
-                    printf("Made a mistake! \n");
-
-                    writeGridToFile(fileOut, grid);                    
-
-                    ++countSolved;
-                    if(countSolved == countToSolve) return; // stop if we've solved enough cells, continue otherwise
-
-                    // we now know value cannot go anywhere in the three regions containing the current cell; clear the value-th bit for those cells
-                    for(int i=0; i<9; ++i)
+                    case 1: // found where value goes
                     {
-                        possibleValues[regions[cell/9][i]] &= ~(1 << value); // row
-                        possibleValues[regions[9 + (cell%9)][i]] &= ~(1 << value); //column
-                        possibleValues[regions[18 + (3*(cell/27)) + ((cell%9)/3)][i]] &= ~(1 << value); // box
+                        int cell = regions[currRegion][cell1];
+                        grid[cell] = value;
+                        possibleValues[cell] = 0;
+
+                        if(!isCellValid(grid, cell)) 
+                        printf("Made a mistake! \n");
+
+                        writeGridToFile(fileOut, grid);                    
+
+                        ++countSolved;
+                        if(countSolved == countToSolve) return; // stop if we've solved enough cells, continue otherwise
+
+                        // we now know value cannot go anywhere in the three regions containing the current cell; clear the value-th bit for those cells
+                        // however we can ignore the current region - the reason we're here is because value couldn't go anywhere else there
+                        int region1, region2;
+
+                        if(currRegion < 9) // current region is row
+                        {
+                            region1 = getColumn(cell); // column
+                            region2 = getBox(cell); // box
+                        }
+                        else if (currRegion < 18) // current region is column
+                        {
+                            region1 = getRow(cell); // row
+                            region2 = getBox(cell); // box
+                        }
+                        else // current region is box
+                        {
+                            region1 = getRow(cell); // row
+                            region2 = getColumn(cell); // column
+                        }
+
+                        for(int i=0; i<9; ++i)
+                        {
+                            possibleValues[regions[region1][i]] &= ~(1 << value);
+                            possibleValues[regions[region2][i]] &= ~(1 << value); 
+
+                            if((!possibleValues[regions[region1][i]] && !grid[regions[region1][i]]) || (!possibleValues[regions[region2][i]] && !grid[regions[region2][i]]))
+                                printf("Made a mistake! \n");  
+                        }
+                        Sleep(300);
                     }
-                    Sleep(1000);
-                }
-            } // value loop
+                        break;
+
+                    // if value only has 2 or 3 candidates in the current region that are also all in another region, we can eliminate value from other cells in that region
+                    // e.g. see Step 14 here: https://www.websudoku.com/images/example-steps.html
+                    case 2: // pointing pairs: https://sudoku.com/sudoku-rules/pointing-pairs/
+                    {
+                        // transform cells from region space to grid space
+                        cell1 = regions[currRegion][cell1];
+                        cell2 = regions[currRegion][cell2];
+
+                        if(currRegion >= 18) // if current region is a box, check if candidates are in the same row or column
+                        {
+                            if(getRow(cell1) == getRow(cell2)) // same row
+                            {
+                                int row = getRow(cell1);
+
+                                // clear value-th bit for all other cells in row
+                                for(int i=0; i<9; ++i)
+                                {
+                                    if(regions[row][i] != cell1 
+                                    && regions[row][i] != cell2)
+                                        possibleValues[regions[row][i]] &= ~(1 << value);
+
+                                    if(!possibleValues[regions[row][i]] && !grid[regions[row][i]])
+                                        printf("Made a mistake! \n"); 
+                                }
+                            }
+
+                            else if(getColumn(cell1) == getColumn(cell2)) // same column
+                            {
+                                int column = getColumn(cell1);
+
+                                // clear value-th bit for all other cells in column
+                                for(int i=0; i<9; ++i)
+                                {
+                                    if(regions[column][i] != cell1 
+                                    && regions[column][i] != cell2)
+                                        possibleValues[regions[column][i]] &= ~(1 << value);
+                                
+                                    if(!possibleValues[regions[column][i]] && !grid[regions[column][i]])
+                                        printf("Made a mistake! \n");  
+                                }
+                            }
+
+                        }
+                        else // else current region is a row or column, check if candidates are in the same box
+                        {
+                            int box = getBox(cell1);
+
+                            if(box == getBox(cell2)) // same box
+                            {
+                                // clear value-th bit for all other cells in box
+                                for(int i=0; i<9; ++i)
+                                {
+                                    if(regions[box][i] != cell1 
+                                    && regions[box][i] != cell2)
+                                        possibleValues[regions[box][i]] &= ~(1 << value);
+
+                                    if(!possibleValues[regions[box][i]] && !grid[regions[box][i]])
+                                        printf("Made a mistake! \n");  
+                                }
+                            }
+                        }
+                    }
+                        break;
+
+                    case 3: // TO DO: pointing triples: https://sudoku.com/sudoku-rules/pointing-triples/
+                    {
+                    }
+                        break;
+                    default: break; // too many candidates, no info
+                }                       
+            } // value loop            
         } // region loop
     }
 }
