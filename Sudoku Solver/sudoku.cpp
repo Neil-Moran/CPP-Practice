@@ -286,7 +286,7 @@ bool isRegionValid(int grid[], int region[]) // checks that specified region of 
     for(int i=0; i<9; ++i)
     {
         switch (grid[region[i]])
-            {
+        {
             case 1:
                 ++countOnes;
                 break;
@@ -316,7 +316,7 @@ bool isRegionValid(int grid[], int region[]) // checks that specified region of 
                 break;            
             default: // 0 or junk value
                 break;
-            }
+        }
     }
 
     // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
@@ -329,14 +329,14 @@ bool isRegionValid(int grid[], int region[]) // checks that specified region of 
 
 bool isCellValid(int grid[], int cell) // checks that the regions of the grid containing the specified cell do not violate Sudoku constraints, but does not check for solvability
 {    
-    if(!isRegionValid(grid, regions[cell/9])) return false; // check row is valid
-    if(!isRegionValid(grid, regions[9 + (cell%9)])) return false; // check column is valid
+    if(!isRegionValid(grid, regions[getRow(cell)])) return false; // check row is valid
+    if(!isRegionValid(grid, regions[getColumn(cell)])) return false; // check column is valid
     // finding the box co-ord looks ugly but is intuitive; 
     // box row (from 0-2) = row/3 = cell/27
     // box column (from 0-2) = column/3 = (cell%9)/3
     // box co-ord (from 0-9) = 3*box row + box column
     // NB: 3*row/3 != row as it is an integer and gets rounded down when divided!
-    if(!isRegionValid(grid, regions[18 + ((3*(cell/27)) + ((cell%9)/3))])) return false; // check box is valid
+    if(!isRegionValid(grid, regions[getBox(cell)])) return false; // check box is valid
 
     return true; // all three regions are still valid
 }
@@ -345,13 +345,13 @@ bool bruteForceSolve(int grid[], int index = 0) // recursively try every value f
 {  
     // note: assumes the grid is a proper Sudoku, i.e. there is only one solution
 
-    while(index <= 81 && grid[index] != 0) ++index; //find the next empty cell
+    while(index < 81 && grid[index] != 0) ++index; //find the next empty cell
 
-    if(index > 81) return true; // if we've filled all cells then this solution is correct!
+    if(index >= 81) return true; // if we've filled all cells then this solution is correct!
     
-    for(int i=1; i<=9; ++i)
+    for(int value=1; value<=9; ++value)
     {
-        grid[index] = i;
+        grid[index] = value;
 
         if(!isCellValid(grid, index)) continue; // if current value makes the grid invalid, continue to the next
 
@@ -640,10 +640,9 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                         possibleValues[regions[column][i]] &= ~(1 << value);
                                 
                                     if(!possibleValues[regions[column][i]] && !grid[regions[column][i]])
-                                        printf("Made a mistake! \n");  
+                                        printf("Made a mistake! \n");
                                 }
                             }
-
                         }
                         else // else current region is a row or column, check if candidates are in the same box
                         {
@@ -659,7 +658,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                         possibleValues[regions[box][i]] &= ~(1 << value);
 
                                     if(!possibleValues[regions[box][i]] && !grid[regions[box][i]])
-                                        printf("Made a mistake! \n");  
+                                        printf("Made a mistake! \n");
                                 }
                             }
                         }
@@ -671,8 +670,8 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     }
                         break;
                     default: break; // too many candidates, no info
-                }                       
-            } // value loop            
+                }
+            } // value loop
         } // region loop
     }
 }
