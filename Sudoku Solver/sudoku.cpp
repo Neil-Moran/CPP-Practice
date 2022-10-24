@@ -734,6 +734,49 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     default: break; // too many candidates, no info
                 }
             } // value loop
+
+            for(int firstCell=0; firstCell<9; ++firstCell) // look for hidden pairs: https://sudoku.com/sudoku-rules/hidden-pairs/
+            {
+                if(grid[regions[currRegion][firstCell]] != 0) continue; // ignore completed cells
+
+                for(int secondCell = firstCell+1; secondCell<9; ++secondCell)
+                {
+                    if(grid[regions[currRegion][secondCell]] != 0) continue; // ignore completed cells
+
+                    // store the values that could possibly be in both cells
+                    int possibleValuesCommon = possibleValues[regions[currRegion][firstCell]] 
+                                                & possibleValues[regions[currRegion][secondCell]];
+
+                    // now store all the values that could possibly be in the other 7 cells
+                    int possibleValuesOther = 0;
+
+                    for(int otherCell=0; otherCell<9; ++otherCell)
+                    {
+                        if(otherCell != firstCell && otherCell != secondCell)
+                            possibleValuesOther |= possibleValues[regions[currRegion][otherCell]] ;
+                    }
+
+                    // find the bits that are set in common but not other, i.e. the values that can only go in firstCell and secondCell
+                    possibleValuesCommon &= ~possibleValuesOther;
+
+                    // count the bits set, i.e. the number of values that can only go in firstCell and secondCell
+                    // https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
+                    int countBits = 0;
+
+                    for(int bitsCopy = possibleValuesCommon; bitsCopy; ++countBits)
+                    {
+                        bitsCopy &= bitsCopy - 1;
+                    }
+
+                    // if there are 2 bits set, i.e. 2 values that can only go in firstCell and secondCell,
+                    // then they MUST go in those 2 cells. All other possibilities can be cleared
+                    if(countBits == 2)
+                    {
+                        possibleValues[regions[currRegion][firstCell]] = possibleValuesCommon;
+                        possibleValues[regions[currRegion][secondCell]] = possibleValuesCommon;
+                    }
+                }
+            }
         } // region loop
     }
 }
