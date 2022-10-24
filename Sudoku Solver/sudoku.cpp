@@ -665,8 +665,70 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     }
                         break;
 
-                    case 3: // TO DO: pointing triples: https://sudoku.com/sudoku-rules/pointing-triples/
+                    case 3: // pointing triples: https://sudoku.com/sudoku-rules/pointing-triples/
                     {
+                        // transform cells from region space to grid space
+                        cell1 = regions[currRegion][cell1];
+                        cell2 = regions[currRegion][cell2];
+                        cell3 = regions[currRegion][cell3];
+
+                        if(currRegion >= 18) // if current region is a box, check if candidates are in the same row or column
+                        {
+                            if((getRow(cell1) == getRow(cell2))
+                                && getRow(cell1) == getRow(cell3)) // same row
+                            {
+                                int row = getRow(cell1);
+
+                                // clear value-th bit for all other cells in row
+                                for(int i=0; i<9; ++i)
+                                {
+                                    if(regions[row][i] != cell1 
+                                    && regions[row][i] != cell2
+                                    && regions[row][i] != cell3)
+                                        possibleValues[regions[row][i]] &= ~(1 << value);
+
+                                    if(!possibleValues[regions[row][i]] && !grid[regions[row][i]])
+                                        printf("Made a mistake! \n"); 
+                                }
+                            }
+
+                            else if((getColumn(cell1) == getColumn(cell2))
+                                && (getColumn(cell1) == getColumn(cell3))) // same column
+                            {
+                                int column = getColumn(cell1);
+
+                                // clear value-th bit for all other cells in column
+                                for(int i=0; i<9; ++i)
+                                {
+                                    if(regions[column][i] != cell1 
+                                    && regions[column][i] != cell2
+                                    && regions[column][i] != cell3)
+                                        possibleValues[regions[column][i]] &= ~(1 << value);
+                                
+                                    if(!possibleValues[regions[column][i]] && !grid[regions[column][i]])
+                                        printf("Made a mistake! \n");
+                                }
+                            }
+                        }
+                        else // else current region is a row or column, check if candidates are in the same box
+                        {
+                            int box = getBox(cell1);
+
+                            if(box == getBox(cell2) && box == getBox(cell3)) // same box
+                            {
+                                // clear value-th bit for all other cells in box
+                                for(int i=0; i<9; ++i)
+                                {
+                                    if(regions[box][i] != cell1 
+                                    && regions[box][i] != cell2
+                                    && regions[box][i] != cell3)
+                                        possibleValues[regions[box][i]] &= ~(1 << value);
+
+                                    if(!possibleValues[regions[box][i]] && !grid[regions[box][i]])
+                                        printf("Made a mistake! \n");
+                                }
+                            }
+                        }
                     }
                         break;
                     default: break; // too many candidates, no info
