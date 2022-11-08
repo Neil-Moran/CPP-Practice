@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include <stdio.h>
 #include <Windows.h>
 #include "sudoku.h"
@@ -440,29 +441,29 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
 {
     int grid[81];
     {
-    int countUnsolved = fillGridFromFile(fileIn, grid);
+        int countUnsolved = fillGridFromFile(fileIn, grid);
 
-    if(countUnsolved == 0) // already solved?!
-    {
-        writeGridToFile(fileOut, grid); // write "result" to output file
-        return;
-    }
+        if(countUnsolved == 0) // already solved?!
+        {
+            writeGridToFile(fileOut, grid); // write "result" to output file
+            return;
+        }
 
-    if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
-    {
-        FILE *output;
-        fopen_s(&output, fileOut, "w+");
-        fprintf(output, 
-        "Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
-        fclose(output);
-        return;
-    }
+        if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
+        {
+            FILE *output;
+            fopen_s(&output, fileOut, "w+");
+            fprintf(output, 
+            "Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
+            fclose(output);
+            return;
+        }
 
-    if(countToSolve > countUnsolved) countToSolve = countUnsolved; 
+        if(countToSolve > countUnsolved) countToSolve = countUnsolved; 
     }
     
     int countSolved = 0;
-    int possibleValues[81] = {0}; // stores the possible values for every empty cell, e.g. if 4th bit is set then 4 is still a possible value
+    int16_t possibleValues[81] = {0}; // stores the possible values for every empty cell, e.g. if 4th bit is set then 4 is still a possible value
 
     for(int i=0; i<81; ++i) // initialise possible values
     {
@@ -489,7 +490,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
             if(possibleValues[currCell] == 0)
                 printf("Made a mistake! \n"); 
 
-            if((possibleValues[currCell] & (possibleValues[currCell] - 1)) == 0) // if possible value is a power of 2 there is only one possible value
+            if((possibleValues[currCell] & (possibleValues[currCell] - 1)) == 0) // if possible value is a power of 2 there is only one possible value TODO: make function
             {
                 // find the correct value
                 int value = 1;
@@ -530,7 +531,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
             for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this region
             {
                 int countCandidates = 0; // number of candidate cells where value could go
-                int cell1 = -999, cell2 = -999, cell3 = -999;
+                int cell1 = -999, cell2 = -999, cell3 = -999; //TODO array
 
                 for(int currCell=0; currCell<9; ++currCell)
                 {
@@ -606,11 +607,11 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     // e.g. see Step 14 here: https://www.websudoku.com/images/example-steps.html
                     case 2: // pointing pairs: https://sudoku.com/sudoku-rules/pointing-pairs/
                     {
-                        // transform cells from region space to grid space
+                        // transform cells from region space to grid space TODO new vars
                         cell1 = regions[currRegion][cell1];
                         cell2 = regions[currRegion][cell2];
 
-                        if(currRegion >= 18) // if current region is a box, check if candidates are in the same row or column
+                        if(currRegion >= 18) // if current region is a box, check if candidates are in the same row or column TODO helper function
                         {
                             if(getRow(cell1) == getRow(cell2)) // same row
                             {
@@ -744,22 +745,22 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     if(grid[regions[currRegion][secondCell]] != 0) continue; // ignore completed cells
 
                     // store the values that could possibly be in both cells
-                    int possibleValuesCommon = possibleValues[regions[currRegion][firstCell]] 
+                    int16_t possibleValuesCommon = possibleValues[regions[currRegion][firstCell]] 
                                                 & possibleValues[regions[currRegion][secondCell]];
 
                     // now store all the values that could possibly be in the other 7 cells
-                    int possibleValuesOther = 0;
+                    int16_t possibleValuesOther = 0;
 
                     for(int otherCell=0; otherCell<9; ++otherCell)
                     {
                         if(otherCell != firstCell && otherCell != secondCell)
-                            possibleValuesOther |= possibleValues[regions[currRegion][otherCell]] ;
+                            possibleValuesOther |= possibleValues[regions[currRegion][otherCell]];
                     }
 
                     // find the bits that are set in common but not other, i.e. the values that can only go in firstCell and secondCell
                     possibleValuesCommon &= ~possibleValuesOther;
 
-                    // count the bits set, i.e. the number of values that can only go in firstCell and secondCell
+                    // count the bits set, i.e. the number of values that can only go in firstCell and secondCell TODO function
                     // https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
                     int countBits = 0;
 
