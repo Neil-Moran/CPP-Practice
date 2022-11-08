@@ -7,6 +7,6 @@ int main()
     solve("test_input_2_solvable.txt", "test_output_2_solvable.txt");
     solve("test_input_3_unsolvable.txt", "test_output_3_unsolvable.txt");
     solveNextNumber("test_input_4_solvable.txt", "test_output_4_solvable.txt", 81);
-    solveNextNumber("test_input_5_solvable.txt", "test_output_5_solvable.txt", 81);
+    solveNextNumber("test_input_5_solvable.txt", "test_output_5_solvable.txt", 81, 300);
     return 0;
 }

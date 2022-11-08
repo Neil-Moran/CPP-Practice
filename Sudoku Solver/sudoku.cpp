@@ -1,5 +1,6 @@
 #pragma once
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <Windows.h>
@@ -448,7 +449,7 @@ void solve(char *fileIn, char *fileOut) // attempts to solve the grid from the i
     else writeGridToFile(fileOut, grid); // write result to output file    
 }
 
-void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves next N cells in the grid
+void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTimeMs) // solves next N cells in the grid
 {
     int grid[81];
     {
@@ -498,8 +499,8 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                 if(!isCellValid(grid, currCell)) // if grid is now invalid remove possible value for this cell
                     possibleValues[currCell] &= ~(1 << value); 
             }
-            if(possibleValues[currCell] == 0)
-                printf("Made a mistake! \n"); 
+
+            assert(possibleValues[currCell] != 0);
 
             if(isPowerOfTwo(possibleValues[currCell])) // if possible value is a power of 2 there is only one possible value
             {
@@ -509,8 +510,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                 grid[currCell] = value;
                 possibleValues[currCell] = 0;
 
-                if(!isCellValid(grid, currCell)) 
-                printf("Made a mistake! \n");                
+                assert(isCellValid(grid, currCell));
 
                 writeGridToFile(fileOut, grid);
 
@@ -528,7 +528,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     possibleValues[regions[column][i]] &= ~(1 << value); //column
                     possibleValues[regions[box][i]] &= ~(1 << value); // box
                 }
-                Sleep(300);
+                Sleep(sleepTimeMs);
             }
 
             else grid[currCell] = 0; // else reset cell to empty
@@ -565,8 +565,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                         grid[cell] = value;
                         possibleValues[cell] = 0;
 
-                        if(!isCellValid(grid, cell)) 
-                        printf("Made a mistake! \n");
+                        assert(isCellValid(grid, cell));
 
                         writeGridToFile(fileOut, grid);                    
 
@@ -598,10 +597,10 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                             possibleValues[regions[region1][i]] &= ~(1 << value);
                             possibleValues[regions[region2][i]] &= ~(1 << value); 
 
-                            if((!possibleValues[regions[region1][i]] && !grid[regions[region1][i]]) || (!possibleValues[regions[region2][i]] && !grid[regions[region2][i]]))
-                                printf("Made a mistake! \n");  
+                            assert((possibleValues[regions[region1][i]] || grid[regions[region1][i]]));
+                            assert((possibleValues[regions[region2][i]] || grid[regions[region2][i]]));
                         }
-                        Sleep(300);
+                        Sleep(sleepTimeMs);
                     }
                         break;
 
@@ -626,8 +625,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                     && regions[row][i] != cell2)
                                         possibleValues[regions[row][i]] &= ~(1 << value);
 
-                                    if(!possibleValues[regions[row][i]] && !grid[regions[row][i]])
-                                        printf("Made a mistake! \n"); 
+                                    assert(possibleValues[regions[row][i]] || grid[regions[row][i]]); 
                                 }
                             }
 
@@ -642,8 +640,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                     && regions[column][i] != cell2)
                                         possibleValues[regions[column][i]] &= ~(1 << value);
                                 
-                                    if(!possibleValues[regions[column][i]] && !grid[regions[column][i]])
-                                        printf("Made a mistake! \n");
+                                    assert(possibleValues[regions[column][i]] || grid[regions[column][i]]);
                                 }
                             }
                         }
@@ -660,8 +657,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                     && regions[box][i] != cell2)
                                         possibleValues[regions[box][i]] &= ~(1 << value);
 
-                                    if(!possibleValues[regions[box][i]] && !grid[regions[box][i]])
-                                        printf("Made a mistake! \n");
+                                    assert(possibleValues[regions[box][i]] || grid[regions[box][i]]);
                                 }
                             }
                         }
@@ -690,8 +686,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                     && regions[row][i] != cell3)
                                         possibleValues[regions[row][i]] &= ~(1 << value);
 
-                                    if(!possibleValues[regions[row][i]] && !grid[regions[row][i]])
-                                        printf("Made a mistake! \n"); 
+                                    assert(possibleValues[regions[row][i]] || grid[regions[row][i]]); 
                                 }
                             }
 
@@ -708,8 +703,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                     && regions[column][i] != cell3)
                                         possibleValues[regions[column][i]] &= ~(1 << value);
                                 
-                                    if(!possibleValues[regions[column][i]] && !grid[regions[column][i]])
-                                        printf("Made a mistake! \n");
+                                    assert(possibleValues[regions[column][i]] || grid[regions[column][i]]);
                                 }
                             }
                         }
@@ -727,8 +721,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                                     && regions[box][i] != cell3)
                                         possibleValues[regions[box][i]] &= ~(1 << value);
 
-                                    if(!possibleValues[regions[box][i]] && !grid[regions[box][i]])
-                                        printf("Made a mistake! \n");
+                                    assert(possibleValues[regions[box][i]] || grid[regions[box][i]]);
                                 }
                             }
                         }
