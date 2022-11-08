@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <Windows.h>
+#include "bitHacks.h"
 #include "sudoku.h"
 
 // Glossary of Sudoku Terms:
@@ -78,6 +79,16 @@ inline int getColumn(int cell) // returns the column of the specified cell
 inline int getBox(int cell) // returns the box of the specified cell
 {
     return 18 + (3*(cell/27)) + ((cell%9)/3);
+}
+
+inline bool isRow(int region) // returns true if the region index is for a box and not a row or column
+{
+    return region < 9;
+}
+
+inline bool isBox(int region) // returns true if the region index is for a box and not a row or column
+{
+    return region >= 18;
 }
 
 void print(int grid[]) // print the current state of the grid, for testing
@@ -490,12 +501,10 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
             if(possibleValues[currCell] == 0)
                 printf("Made a mistake! \n"); 
 
-            if((possibleValues[currCell] & (possibleValues[currCell] - 1)) == 0) // if possible value is a power of 2 there is only one possible value TODO: make function
+            if(isPowerOfTwo(possibleValues[currCell])) // if possible value is a power of 2 there is only one possible value
             {
                 // find the correct value
-                int value = 1;
-                while((possibleValues[currCell] >> value) != 1 && value <= 9) 
-                    ++value;
+                int value = getPowerOfTwo(possibleValues[currCell]);
 
                 grid[currCell] = value;
                 possibleValues[currCell] = 0;
@@ -531,35 +540,28 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
             for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this region
             {
                 int countCandidates = 0; // number of candidate cells where value could go
-                int cell1 = -999, cell2 = -999, cell3 = -999; //TODO array
+                int candidateCells[3] = {-999, -999, -999};
 
                 for(int currCell=0; currCell<9; ++currCell)
                 {
                     if((possibleValues[regions[currRegion][currCell]] & (1 << value)) > 0) // value can go in currCell
                     {   
-                        switch (countCandidates++) // note the increment
+                        if(countCandidates < 3) // if less than 3 candidates so far, store the current cell and keep going                        
+                            candidateCells[countCandidates++] = currCell;
+                            
+                        else // if there are more than 3 candidates then no possible info, continue to next value
                         {
-                        case 0: // first candidate
-                            cell1 = currCell;
+                            ++countCandidates;
                             break;
-                        // if there is more than one candidate cell, we don't know where value goes 
-                        // but we may have new info if there are only 2 or 3
-                        case 1: // second candidate
-                            cell2 = currCell;
-                            break;
-                        case 2: // third candidate
-                            cell3 = currCell;
-                            break;                        
-                        // if there are more than 3 then no possible info, continue to next value
-                        default: currCell = 10; // this will terminate the for loop                            
                         }
                     }
                 }
+
                 switch(countCandidates)
                 {
                     case 1: // found where value goes
                     {
-                        int cell = regions[currRegion][cell1];
+                        int cell = regions[currRegion][candidateCells[0]];
                         grid[cell] = value;
                         possibleValues[cell] = 0;
 
@@ -575,12 +577,12 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                         // however we can ignore the current region - the reason we're here is because value couldn't go anywhere else there
                         int region1, region2;
 
-                        if(currRegion < 9) // current region is row
+                        if(isRow(currRegion)) // current region is row
                         {
                             region1 = getColumn(cell); // column
                             region2 = getBox(cell); // box
                         }
-                        else if (currRegion < 18) // current region is column
+                        else if (!isBox(currRegion)) // current region is column
                         {
                             region1 = getRow(cell); // row
                             region2 = getBox(cell); // box
@@ -607,11 +609,11 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     // e.g. see Step 14 here: https://www.websudoku.com/images/example-steps.html
                     case 2: // pointing pairs: https://sudoku.com/sudoku-rules/pointing-pairs/
                     {
-                        // transform cells from region space to grid space TODO new vars
-                        cell1 = regions[currRegion][cell1];
-                        cell2 = regions[currRegion][cell2];
+                        // transform cells from region space to grid space
+                        int cell1 = regions[currRegion][candidateCells[0]];
+                        int cell2 = regions[currRegion][candidateCells[1]];
 
-                        if(currRegion >= 18) // if current region is a box, check if candidates are in the same row or column TODO helper function
+                        if(isBox(currRegion)) // if current region is a box, check if candidates are in the same row or column
                         {
                             if(getRow(cell1) == getRow(cell2)) // same row
                             {
@@ -669,11 +671,11 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     case 3: // pointing triples: https://sudoku.com/sudoku-rules/pointing-triples/
                     {
                         // transform cells from region space to grid space
-                        cell1 = regions[currRegion][cell1];
-                        cell2 = regions[currRegion][cell2];
-                        cell3 = regions[currRegion][cell3];
+                        int cell1 = regions[currRegion][candidateCells[0]];
+                        int cell2 = regions[currRegion][candidateCells[1]];
+                        int cell3 = regions[currRegion][candidateCells[2]];
 
-                        if(currRegion >= 18) // if current region is a box, check if candidates are in the same row or column
+                        if(isBox(currRegion)) // if current region is a box, check if candidates are in the same row or column
                         {
                             if((getRow(cell1) == getRow(cell2))
                                 && getRow(cell1) == getRow(cell3)) // same row
@@ -760,21 +762,13 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve) // solves ne
                     // find the bits that are set in common but not other, i.e. the values that can only go in firstCell and secondCell
                     possibleValuesCommon &= ~possibleValuesOther;
 
-                    // count the bits set, i.e. the number of values that can only go in firstCell and secondCell TODO function
-                    // https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
-                    int countBits = 0;
-
-                    for(int bitsCopy = possibleValuesCommon; bitsCopy; ++countBits)
-                    {
-                        bitsCopy &= bitsCopy - 1;
-                    }
-
                     // if there are 2 bits set, i.e. 2 values that can only go in firstCell and secondCell,
                     // then they MUST go in those 2 cells. All other possibilities can be cleared
-                    if(countBits == 2)
+                    if(getCountBitsSet(possibleValuesCommon) == 2)
                     {
                         possibleValues[regions[currRegion][firstCell]] = possibleValuesCommon;
                         possibleValues[regions[currRegion][secondCell]] = possibleValuesCommon;
+                        break; // continue to next value for firstCell
                     }
                 }
             }
