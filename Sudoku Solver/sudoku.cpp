@@ -92,28 +92,53 @@ inline bool isBox(int region) // returns true if the region index is for a box a
     return region >= 18;
 }
 
-void print(int grid[]) // print the current state of the grid, for testing
+int fillGridFromFile(char *file, int grid[9][9]) // writes the values from the file into the grid array and returns the count of empty cells
 {
-    for(int i=0, j=0; i<81; ++i, ++j)
-    {
-        if(j == 9) // print a new line every row (9 values)
-        {
-            printf("\n");
-            j = 0;
-        }
+    int countUnsolved = 0;
 
-        printf("%i ", grid[i]);        
+    FILE *input;
+    fopen_s(&input, file, "r");
+
+    for(int row=0; row<9; ++row)
+    {
+        for(int column=0; column<9; ++column)
+        {
+            fscanf_s(input, "%d", &grid[row][column]);
+
+            if(grid[row][column] == 0) ++countUnsolved;
+        }
     }
-    printf("\n");
+
+    fclose(input);
+
+    return countUnsolved;
 }
 
-bool isValid(int grid[]) // checks that the grid does not violate Sudoku constraints, but does not check for solvability
+void writeGridToFile(char *file, int grid[9][9]) // writes the values from the grid array to the file
+{
+    FILE *output;
+    fopen_s(&output, file, "w+");
+
+    for(int row=0; row<9; ++row)
+    {
+        for(int column=0; column<9; ++column)
+        {
+            if(grid[row][column] == 0) fprintf(output, "_ ");
+            else fprintf(output, "%d ", grid[row][column]);
+        }
+        fprintf(output, "\n"); // print a new line every row
+    }
+
+    fclose(output);
+}
+
+bool isValid(int grid[9][9]) // checks that the grid does not violate Sudoku constraints, but does not check for solvability
 {
     // we will check each group (row, column or box) and verify no number appears more than once
     int countOnes, countTwos, countThrees, countFours, countFives, countSixes, countSevens, countEights, countNines;
 
     /* --- CHECK ROWS ARE VALID --- */
-    for(int i=0; i<73; i+=9)
+    for(int row=0; row<9; ++row)
     {
         countOnes = 0;
         countTwos = 0;
@@ -124,64 +149,10 @@ bool isValid(int grid[]) // checks that the grid does not violate Sudoku constra
         countSevens = 0;
         countEights = 0;
         countNines = 0;
-
-        for(int j=0; j<9; ++j)
+        
+        for(int column=0; column<9; ++column)
         {
-            switch (grid[i+j])
-            {
-            case 1:
-                ++countOnes;
-                break;
-            case 2:
-                ++countTwos;
-                break;
-            case 3:
-                ++countThrees;
-                break;
-            case 4:
-                ++countFours;
-                break;
-            case 5:
-                ++countFives;
-                break;
-            case 6:
-                ++countSixes;
-                break;
-            case 7:
-                ++countSevens;
-                break;
-            case 8:
-                ++countEights;
-                break;
-            case 9:
-                ++countNines;
-                break;            
-            default: // 0 or junk value
-                break;
-            }
-        }
-
-        if(countOnes > 1 || countTwos > 1 || countThrees > 1
-            || countFours > 1 || countFives > 1 || countSixes > 1
-            || countSevens > 1 || countEights > 1 || countNines > 1) return false;
-    }
-
-    /* --- CHECK COLUMNS ARE VALID --- */
-    for(int i=0; i<9; ++i)
-    {
-        countOnes = 0;
-        countTwos = 0;
-        countThrees = 0;
-        countFours = 0;
-        countFives = 0;
-        countSixes = 0;
-        countSevens = 0;
-        countEights = 0;
-        countNines = 0;
-
-        for(int j=0; j<73; j+=9)
-        {
-            switch (grid[i+j])
+            switch (grid[row][column])
             {
             case 1:
                 ++countOnes;
@@ -217,14 +188,69 @@ bool isValid(int grid[]) // checks that the grid does not violate Sudoku constra
 
         // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
         if((countOnes | countTwos | countThrees
-            | countFours | countFives | countSixes
+            | countFours | countFives | countSixes 
+            | countSevens | countEights | countNines) > 1) return false;        
+    }
+
+    /* --- CHECK COLUMNS ARE VALID --- */
+    for(int column=0; column<9; ++column)
+    {
+        countOnes = 0;
+        countTwos = 0;
+        countThrees = 0;
+        countFours = 0;
+        countFives = 0;
+        countSixes = 0;
+        countSevens = 0;
+        countEights = 0;
+        countNines = 0;
+        
+        for(int row=0; row<9; ++row)
+        {
+            switch (grid[row][column])
+            {
+            case 1:
+                ++countOnes;
+                break;
+            case 2:
+                ++countTwos;
+                break;
+            case 3:
+                ++countThrees;
+                break;
+            case 4:
+                ++countFours;
+                break;
+            case 5:
+                ++countFives;
+                break;
+            case 6:
+                ++countSixes;
+                break;
+            case 7:
+                ++countSevens;
+                break;
+            case 8:
+                ++countEights;
+                break;
+            case 9:
+                ++countNines;
+                break;            
+            default: // 0 or junk value
+                break;
+            }
+        }
+        
+        // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+        if((countOnes | countTwos | countThrees
+            | countFours | countFives | countSixes 
             | countSevens | countEights | countNines) > 1) return false;
     }
 
     /* --- CHECK BOXES ARE VALID --- */
-    for(int i=0; i<55; i+=27) // the boxes on the left stack of the grid start at indices 0, 27 and 54
+    for(int colOffset=0; colOffset<=6; colOffset+=3)
     {
-        for(int j=0; j<7; j+=3) // e.g. if i=0 the three boxes in that band start at indices 0, 3 and 6
+        for(int rowOffset=0; rowOffset<=6; rowOffset+=3)
         {
             countOnes = 0;
             countTwos = 0;
@@ -236,56 +262,51 @@ bool isValid(int grid[]) // checks that the grid does not violate Sudoku constra
             countEights = 0;
             countNines = 0;
 
-            // navigate the indices within the box
-            /* the below is a hack to yield k =  0,  1,  2, 
-                                                 9, 10, 11, 
-                                                18, 19, 20 */
-                    
-            for(int k=0; k<21; ++k)
+            for(int column=0; column<3; ++column)
             {
-                // skip to next row of the box if necessary
-                if(k==3) k = 9;
-                if(k==12) k = 18;                
-
-                switch (grid[i+j+k])
+                for(int row=0; row<3; ++row)
                 {
-                case 1:
-                    ++countOnes;
-                    break;
-                case 2:
-                    ++countTwos;
-                    break;
-                case 3:
-                    ++countThrees;
-                    break;
-                case 4:
-                    ++countFours;
-                    break;
-                case 5:
-                    ++countFives;
-                    break;
-                case 6:
-                    ++countSixes;
-                    break;
-                case 7:
-                    ++countSevens;
-                    break;
-                case 8:
-                    ++countEights;
-                    break;
-                case 9:
-                    ++countNines;
-                    break;            
-                default: // 0 or junk value
-                    break;
-                }        
+                    switch (grid[row+rowOffset][column+colOffset])
+                    {
+                    case 1:
+                        ++countOnes;
+                        break;
+                    case 2:
+                        ++countTwos;
+                        break;
+                    case 3:
+                        ++countThrees;
+                        break;
+                    case 4:
+                        ++countFours;
+                        break;
+                    case 5:
+                        ++countFives;
+                        break;
+                    case 6:
+                        ++countSixes;
+                        break;
+                    case 7:
+                        ++countSevens;
+                        break;
+                    case 8:
+                        ++countEights;
+                        break;
+                    case 9:
+                        ++countNines;
+                        break;            
+                    default: // 0 or junk value
+                        break;
+                    }
+                }
             }
-            
-            if(countOnes > 1 || countTwos > 1 || countThrees > 1
-                || countFours > 1 || countFives > 1 || countSixes > 1
-                || countSevens > 1 || countEights > 1 || countNines > 1) return false;
+
+            // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+            if((countOnes | countTwos | countThrees
+                | countFours | countFives | countSixes 
+                | countSevens | countEights | countNines) > 1) return false;            
         }
-    }    
+    }
 
     return true; // grid is valid if we made it here
 }
@@ -340,84 +361,203 @@ bool isRegionValid(int grid[], int region[]) // checks that specified region of 
     else return true;
 }
 
-bool isCellValid(int grid[], int cell) // checks that the regions of the grid containing the specified cell do not violate Sudoku constraints, but does not check for solvability
-{    
-    if(!isRegionValid(grid, regions[getRow(cell)])) return false; // check row is valid
-    if(!isRegionValid(grid, regions[getColumn(cell)])) return false; // check column is valid
-    // finding the box co-ord looks ugly but is intuitive; 
-    // box row (from 0-2) = row/3 = cell/27
-    // box column (from 0-2) = column/3 = (cell%9)/3
-    // box co-ord (from 0-9) = 3*box row + box column
-    // NB: 3*row/3 != row as it is an integer and gets rounded down when divided!
-    if(!isRegionValid(grid, regions[getBox(cell)])) return false; // check box is valid
+bool isRowValid(int grid[9][9], int row) // checks that the specified row does not violate Sudoku constraints
+{
+    int countOnes = 0, countTwos = 0, countThrees = 0, countFours = 0, countFives = 0, countSixes = 0, countSevens = 0, countEights = 0, countNines = 0;
 
-    return true; // all three regions are still valid
+    for(int column=0; column<9; ++column)
+    {
+        switch (grid[row][column])
+        {
+            case 1:
+                ++countOnes;
+                break;
+            case 2:
+                ++countTwos;
+                break;
+            case 3:
+                ++countThrees;
+                break;
+            case 4:
+                ++countFours;
+                break;
+            case 5:
+                ++countFives;
+                break;
+            case 6:
+                ++countSixes;
+                break;
+            case 7:
+                ++countSevens;
+                break;
+            case 8:
+                ++countEights;
+                break;
+            case 9:
+                ++countNines;
+                break;            
+            default: // 0 or junk value
+                break;
+        }
+    }
+
+    // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+    if((countOnes | countTwos | countThrees
+        | countFours | countFives | countSixes 
+        | countSevens | countEights | countNines) > 1) return false;
+
+    else return true;
 }
 
-bool bruteForceSolve(int grid[], int index = 0) // recursively try every value from 1 to 9 at the specified index and every empty cell onwards
+bool isColumnValid(int grid[9][9], int column) // checks that the specified column does not violate Sudoku constraints
+{
+    int countOnes = 0, countTwos = 0, countThrees = 0, countFours = 0, countFives = 0, countSixes = 0, countSevens = 0, countEights = 0, countNines = 0;
+
+    for(int row=0; row<9; ++row)
+    {
+        switch (grid[row][column])
+        {
+            case 1:
+                ++countOnes;
+                break;
+            case 2:
+                ++countTwos;
+                break;
+            case 3:
+                ++countThrees;
+                break;
+            case 4:
+                ++countFours;
+                break;
+            case 5:
+                ++countFives;
+                break;
+            case 6:
+                ++countSixes;
+                break;
+            case 7:
+                ++countSevens;
+                break;
+            case 8:
+                ++countEights;
+                break;
+            case 9:
+                ++countNines;
+                break;            
+            default: // 0 or junk value
+                break;
+        }
+    }
+
+    // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+    if((countOnes | countTwos | countThrees
+        | countFours | countFives | countSixes 
+        | countSevens | countEights | countNines) > 1) return false;
+
+    else return true;
+}
+
+bool isBoxValid(int grid[9][9], int row, int column) // checks that the box containing the specified cell does not violate Sudoku constraints
+{
+    int countOnes = 0, countTwos = 0, countThrees = 0, countFours = 0, countFives = 0, countSixes = 0, countSevens = 0, countEights = 0, countNines = 0;
+
+    // round down the current row and column to the nearest factor of 3
+    int rowOffset = 3*(row/3);
+    int colOffset = 3*(column/3);
+
+    for(int columnIt=0; columnIt<3; ++columnIt)
+    {
+        for(int rowIt=0; rowIt<3; ++rowIt)
+        {
+            switch (grid[rowIt+rowOffset][columnIt+colOffset])
+            {
+            case 1:
+                ++countOnes;
+                break;
+            case 2:
+                ++countTwos;
+                break;
+            case 3:
+                ++countThrees;
+                break;
+            case 4:
+                ++countFours;
+                break;
+            case 5:
+                ++countFives;
+                break;
+            case 6:
+                ++countSixes;
+                break;
+            case 7:
+                ++countSevens;
+                break;
+            case 8:
+                ++countEights;
+                break;
+            case 9:
+                ++countNines;
+                break;            
+            default: // 0 or junk value
+                break;
+            }
+        }
+    }
+
+    // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+    if((countOnes | countTwos | countThrees
+        | countFours | countFives | countSixes 
+        | countSevens | countEights | countNines) > 1) return false;
+
+    else return true;
+}
+
+inline bool isCellValid(int grid[9][9], int row, int column) // checks that the regions of the grid containing the specified cell do not violate Sudoku constraints
+{
+    if(isRowValid(grid, row) && isColumnValid(grid, column) && isBoxValid(grid, row, column))
+        return true; // all three regions are still valid
+    else return false;
+}
+
+bool bruteForceSolve(int grid[9][9], int row = 0, int column = 0) // recursively try every value from 1 to 9 at the specified index and every empty cell onwards
 {  
     // note: assumes the grid is a proper Sudoku, i.e. there is only one solution
 
-    while(index < 81 && grid[index] != 0) ++index; //find the next empty cell
+    if(column == 9) // reached the end of the row, jump to the start of the next one
+    {
+        column = 0;
+        ++row;
+    }
 
-    if(index >= 81) return true; // if we've filled all cells then this solution is correct!
+    while(row < 9 && grid[row][column] != 0) // find the next empty cell
+    {
+        ++column;
+        if(column == 9) // reached the end of the row, jump to the start of the next one
+        {
+            column = 0;
+            ++row;
+        }
+    }
+
+    if(row >= 9) return true; // if we've filled all cells then this solution is correct!
     
     for(int value=1; value<=9; ++value)
     {
-        grid[index] = value;
+        grid[row][column] = value;
 
-        if(!isCellValid(grid, index)) continue; // if current value makes the grid invalid, continue to the next
+        if(!isCellValid(grid, row, column)) continue; // if current value makes the grid invalid, continue to the next
 
-        if(bruteForceSolve(grid, index + 1)) return true; // if all other empty cells can be filled, this value for grid[index] is correct!
+        if(bruteForceSolve(grid, row, column+1)) return true; // if all other empty cells can be filled, this value is correct!
     }
 
     // if no value from 1-9 is valid in this cell then the solution up to now is wrong
-    grid[index] = 0; // remove the incorrect value, we'll try setting it again in another recursion
+    grid[row][column] = 0; // remove the incorrect value, we'll try setting it again in another recursion
     return false; 
-}
-
-int fillGridFromFile(char *file, int grid[]) // writes the values from the file into the grid array and returns the count of empty cells
-{
-    int countUnsolved = 0;
-
-    FILE *input;
-    fopen_s(&input, file, "r");
-
-    for(int i=0; i<81; ++i)
-    {
-        fscanf_s(input, "%d", &grid[i]);
-
-        if(grid[i] == 0) ++countUnsolved;
-    }
-
-    fclose(input);
-
-    return countUnsolved;
-}
-
-void writeGridToFile(char *file, int grid[]) // writes the values from the grid array to the file
-{
-    FILE *output;
-    fopen_s(&output, file, "w+");
-
-    for(int i=0, j=0; i<81; ++i, ++j)
-    {
-        if(j == 9) // print a new line every row (9 values)
-        {
-            fprintf(output, "\n");
-            j = 0;
-        }
-        
-        if(grid[i] == 0) fprintf(output, "_ ");
-        else fprintf(output, "%d ", grid[i]);
-    }
-
-    fclose(output);
 }
 
 void solve(char *fileIn, char *fileOut) // attempts to solve the grid from the input file by brute force, and writes the result to the output file
 {
-    int grid[81];
+    int grid[9][9];
     int countUnsolved = fillGridFromFile(fileIn, grid);
 
     if(countUnsolved == 0) // already solved?!
@@ -451,7 +591,7 @@ void solve(char *fileIn, char *fileOut) // attempts to solve the grid from the i
 
 void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTimeMs) // solves next N cells in the grid
 {
-    int grid[81];
+    int grid[9][9];
     {
         int countUnsolved = fillGridFromFile(fileIn, grid);
 
@@ -475,72 +615,86 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTim
     }
     
     int countSolved = 0;
-    int16_t possibleValues[81] = {0}; // stores the possible values for every empty cell, e.g. if 4th bit is set then 4 is still a possible value
+    int16_t possibleValues[9][9] = {0}; // stores the possible values for every empty cell, e.g. if 4th bit is set then 4 is still a possible value
 
-    for(int i=0; i<81; ++i) // initialise possible values
+    for(int row=0; row<9; ++row) // initialise possible values
     {
-        if(grid[i] == 0) possibleValues[i] = 0b1111111110;
+        for(int column=0; column<9; ++column)
+        {
+            if(grid[row][column] == 0) possibleValues[row][column] = 0b1111111110;
+        }
     }
     
     for(int numLoops = 0; numLoops <= countToSolve; ++numLoops) // if we don't solve at least one number every iteration (after the first initialisation pass), the grid is unsolvable
     {
-        printf("Starting Loop %i\n", numLoops);
         // check possible values for every empty cell
-        for(int currCell=0; currCell<81; ++currCell)
+        for(int currRow=0; currRow<9; ++currRow)
         {
-            if(grid[currCell] != 0) continue; // ignore completed cells
-
-            // try all values in the empty cell, if the grid is still valid then that value is possible
-            for(int value=1; value<=9; ++value)
+            for(int currCol=0; currCol<9; ++currCol)
             {
-                if(!(possibleValues[currCell] & (1 << value))) continue; // skip if we already know value is not possible
-                grid[currCell] = value;
+                if(grid[currRow][currCol] != 0) continue; // ignore completed cells
 
-                if(!isCellValid(grid, currCell)) // if grid is now invalid remove possible value for this cell
-                    possibleValues[currCell] &= ~(1 << value); 
-            }
-
-            assert(possibleValues[currCell] != 0);
-
-            if(isPowerOfTwo(possibleValues[currCell])) // if possible value is a power of 2 there is only one possible value
-            {
-                // find the correct value
-                int value = getPowerOfTwo(possibleValues[currCell]);
-
-                grid[currCell] = value;
-                possibleValues[currCell] = 0;
-
-                assert(isCellValid(grid, currCell));
-
-                writeGridToFile(fileOut, grid);
-
-                ++countSolved;
-                if(countSolved == countToSolve) return; // stop if we've solved enough cells, continue otherwise
-
-                // we now know that value cannot go anywhere in the three regions containing the current cell; clear the appropriate bit for those cells
-                int row = getRow(currCell);
-                int column = getColumn(currCell);
-                int box = getBox(currCell);
-
-                for(int i=0; i<9; ++i)
+                // try all values in the empty cell, if the grid is still valid then that value is possible
+                for(int value=1; value<=9; ++value)
                 {
-                    possibleValues[regions[row][i]] &= ~(1 << value); // row
-                    possibleValues[regions[column][i]] &= ~(1 << value); //column
-                    possibleValues[regions[box][i]] &= ~(1 << value); // box
-                }
-                Sleep(sleepTimeMs);
-            }
+                    if(!(possibleValues[currRow][currCol] & (1 << value))) continue; // skip if we already know value is not possible
+                    grid[currRow][currCol] = value;
 
-            else grid[currCell] = 0; // else reset cell to empty
+                    if(!isCellValid(grid, currRow, currCol)) // if grid is now invalid remove possible value for this cell
+                        possibleValues[currRow][currCol] &= ~(1 << value); 
+                }
+
+                assert(possibleValues[currRow][currCol] != 0);
+
+                if(isPowerOfTwo(possibleValues[currRow][currCol])) // if possible value is a power of 2 there is only one possible value
+                {
+                    // find the correct value
+                    int value = getPowerOfTwo(possibleValues[currRow][currCol]);
+
+                    grid[currRow][currCol] = value;
+                    possibleValues[currRow][currCol] = 0;
+
+                    assert(isCellValid(grid, currRow, currCol));
+
+                    writeGridToFile(fileOut, grid);
+
+                    ++countSolved;
+                    if(countSolved == countToSolve) return; // stop if we've solved enough cells, continue otherwise
+
+                    // we now know that value cannot go anywhere in the three regions containing the current cell; clear the appropriate bit for those cells
+                    {
+                        for(int i=0; i<9; ++i)
+                        {
+                            possibleValues[currRow][i] &= ~(1 << value); // row
+                            possibleValues[i][currCol] &= ~(1 << value); // column
+                        }
+
+                        // round down the current row and column to the nearest factor of 3
+                        int rowOffset = 3*(currRow/3);
+                        int colOffset = 3*(currCol/3);
+
+                        for(int columnIt=0; columnIt<3; ++columnIt)
+                        {
+                            for(int rowIt=0; rowIt<3; ++rowIt)
+                            {
+                                possibleValues[rowIt+rowOffset][columnIt+colOffset] &= ~(1 << value); // box
+                            }
+                        }
+                    }
+                    Sleep(sleepTimeMs);
+                }
+
+                else grid[currRow][currCol] = 0; // else reset cell to empty
+            }
         } // cell loop
 
         // search every region to see if any values can only be in one cell
-        for(int currRegion=0; currRegion<27; ++currRegion)
+        /*for(int currRegion=0; currRegion<27; ++currRegion)
         {
             for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this region
             {
                 int countCandidates = 0; // number of candidate cells where value could go
-                int candidateCells[3] = {-999, -999, -999};
+                int candidateCells[3] = {-999, -999, -999}; // co-ordinates of first 3 candidate cells
 
                 for(int currCell=0; currCell<9; ++currCell)
                 {
@@ -766,5 +920,6 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTim
                 }
             }
         } // region loop
-    }
+    */
+   }
 }
