@@ -731,6 +731,46 @@ void solver::solveValueForRegion(int value, cell region[]) // checks where speci
 
         case 3: // pointing triples: https://sudoku.com/sudoku-rules/pointing-triples/
         {
+            // if current region is a box, check if candidates are also in the same row or column
+            if(isBox(region)) 
+            {
+                if(candidateCells[0].row == candidateCells[1].row
+                    && candidateCells[0].row == candidateCells[2].row) // candidates are in the same row
+                {
+                    int row = candidateCells[0].row;
+
+                    for(int currCol=0; currCol<9; ++currCol)
+                    {
+                        // clear possible value for non-candidate cells
+                        if((currCol != candidateCells[0].column) 
+                            && (currCol != candidateCells[1].column)
+                            && (currCol != candidateCells[2].column))
+                        {
+                            possibleValuesMask[row][currCol] &= ~(1 << value);
+
+                            assert(possibleValuesMask[row][currCol] || grid[row][currCol]);
+                        }
+                    }
+                }
+                else if(candidateCells[0].column == candidateCells[1].column
+                        && candidateCells[0].column == candidateCells[2].column) // candidates are in the same column
+                {
+                    int column = candidateCells[0].column;
+
+                    for(int currRow=0; currRow<9; ++currRow)
+                    {
+                        // clear possible value for non-candidate cells
+                        if((currRow != candidateCells[0].row) 
+                            && (currRow != candidateCells[1].row)
+                            && (currRow != candidateCells[2].row))
+                        {
+                            possibleValuesMask[currRow][column] &= ~(1 << value);
+
+                            assert(possibleValuesMask[currRow][column] || grid[currRow][column]);
+                        }
+                    }
+                }
+            }
             // if((region[0].row == region[8].row)) // if current region is a row, check if candidates are also in the same box
             // {
             //     int rowOffset = 3*(candidateCells[0].row/3);
