@@ -82,14 +82,19 @@ inline int getBox(int cell) // returns the box of the specified cell
     return 18 + (3*(cell/27)) + ((cell%9)/3);
 }
 
-inline bool isRow(int region) // returns true if the region index is for a box and not a row or column
+inline bool isRow(cell region[8]) // returns true if the region is a row
 {
-    return region < 9;
+    return (region[0].row == region[8].row);
 }
 
-inline bool isBox(int region) // returns true if the region index is for a box and not a row or column
+inline bool isColumn(cell region[8]) // returns true if the region is a column
 {
-    return region >= 18;
+    return (region[0].column == region[8].column);
+}
+
+inline bool isBox(cell region[8]) // returns true if the region is a box
+{
+    return ((region[0].row+2) == region[8].row);
 }
 
 int fillGridFromFile(char *file, int grid[9][9]) // writes the values from the file into the grid array and returns the count of empty cells
@@ -189,7 +194,7 @@ bool isValid(int grid[9][9]) // checks that the grid does not violate Sudoku con
         // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
         if((countOnes | countTwos | countThrees
             | countFours | countFives | countSixes 
-            | countSevens | countEights | countNines) > 1) return false;        
+            | countSevens | countEights | countNines) > 1) return false;
     }
 
     /* --- CHECK COLUMNS ARE VALID --- */
@@ -248,9 +253,9 @@ bool isValid(int grid[9][9]) // checks that the grid does not violate Sudoku con
     }
 
     /* --- CHECK BOXES ARE VALID --- */
-    for(int colOffset=0; colOffset<=6; colOffset+=3)
+    for(int rowOffset=0; rowOffset<=6; rowOffset+=3)
     {
-        for(int rowOffset=0; rowOffset<=6; rowOffset+=3)
+        for(int colOffset=0; colOffset<=6; colOffset+=3)
         {
             countOnes = 0;
             countTwos = 0;
@@ -262,11 +267,11 @@ bool isValid(int grid[9][9]) // checks that the grid does not violate Sudoku con
             countEights = 0;
             countNines = 0;
 
-            for(int column=0; column<3; ++column)
+            for(int row=rowOffset; row<3+rowOffset; ++row)
             {
-                for(int row=0; row<3; ++row)
+                for(int column=colOffset; column<3+colOffset; ++column)
                 {
-                    switch (grid[row+rowOffset][column+colOffset])
+                    switch (grid[row][column])
                     {
                     case 1:
                         ++countOnes;
@@ -465,11 +470,11 @@ bool isBoxValid(int grid[9][9], int row, int column) // checks that the box cont
     int rowOffset = 3*(row/3);
     int colOffset = 3*(column/3);
 
-    for(int columnIt=0; columnIt<3; ++columnIt)
+    for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
     {
-        for(int rowIt=0; rowIt<3; ++rowIt)
+        for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
         {
-            switch (grid[rowIt+rowOffset][columnIt+colOffset])
+            switch (grid[rowIt][columnIt])
             {
             case 1:
                 ++countOnes;
@@ -589,42 +594,296 @@ void solve(char *fileIn, char *fileOut) // attempts to solve the grid from the i
     else writeGridToFile(fileOut, grid); // write result to output file    
 }
 
-void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTimeMs) // solves next N cells in the grid
+solver::solver(char *fileIn, char *fileOut, int countToSolve, int sleepTimeMs)
 {
-    int grid[9][9];
-    {
-        int countUnsolved = fillGridFromFile(fileIn, grid);
-
-        if(countUnsolved == 0) // already solved?!
-        {
-            writeGridToFile(fileOut, grid); // write "result" to output file
-            return;
-        }
-
-        if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
-        {
-            FILE *output;
-            fopen_s(&output, fileOut, "w+");
-            fprintf(output, 
-            "Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
-            fclose(output);
-            return;
-        }
-
-        if(countToSolve > countUnsolved) countToSolve = countUnsolved; 
-    }
+    file = fileOut;
+    this->countToSolve = countToSolve;
     
-    int countSolved = 0;
-    int16_t possibleValues[9][9] = {0}; // stores the possible values for every empty cell, e.g. if 4th bit is set then 4 is still a possible value
+    int countUnsolved = fillGridFromFile(fileIn, grid);
+
+    if(countUnsolved == 0) // already solved?!
+    {
+        write(); // write "result" to output file
+        return;
+    }
+
+    if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
+    {
+        FILE *output;
+        fopen_s(&output, fileOut, "w+");
+        fprintf(output, 
+        "Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
+        fclose(output);
+        return;
+    }
+
+    if(countToSolve > countUnsolved) this->countToSolve = countUnsolved;         
+    
+    countSolved = 0;
+    finished = false;
+    this->sleepTimeMs = sleepTimeMs;
 
     for(int row=0; row<9; ++row) // initialise possible values
     {
         for(int column=0; column<9; ++column)
         {
-            if(grid[row][column] == 0) possibleValues[row][column] = 0b1111111110;
+            if(grid[row][column] == 0) possibleValuesMask[row][column] = 0b1111111110;
+
+            else possibleValuesMask[row][column] = 0;
         }
     }
-    
+}
+
+void solver::write()
+{
+    writeGridToFile(file, grid);
+}
+
+void solver::writeCell(cell cell, int value) // enter value into cell and write the result to file
+{
+    int row = cell.row;
+    int column = cell.column;
+
+    grid[row][column] = value;
+    possibleValuesMask[row][column] = 0;
+
+    assert(isCellValid(grid, row, column));
+
+    write();
+
+    ++countSolved;
+    if(countSolved == countToSolve) // stop if we've solved enough cells, continue otherwise
+    {
+        finished = true;
+        return;
+    }
+
+    // we now know that value cannot go anywhere in the three regions containing the current cell; clear the appropriate bit for those cells
+    {
+        for(int i=0; i<9; ++i)
+        {
+            possibleValuesMask[row][i] &= ~(1 << value); // row
+            possibleValuesMask[i][column] &= ~(1 << value); // column
+
+            assert(possibleValuesMask[row][i] || grid[row][i]);
+            assert(possibleValuesMask[i][column] || grid[i][column]);
+        }
+
+        // round down the current row and column to the nearest factor of 3
+        int rowOffset = 3*(row/3);
+        int colOffset = 3*(column/3);
+
+        for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
+        {
+            for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
+            {
+                possibleValuesMask[rowIt][columnIt] &= ~(1 << value); // box
+
+                assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
+            }
+        }
+    }
+    Sleep(sleepTimeMs); // sleep if desired, for an animated solve effect!
+}
+
+void solver::solveValueForRegion(int value, cell region[]) // checks where specified value could go in the specified region, and updates grid or possible values accordingly
+{
+    int countCandidates = 0; // number of candidate cells where value could go
+    cell candidateCells[3]; // co-ordinates of first 3 candidate cells
+
+    for(int currCell=0; currCell<9; ++currCell)
+    {
+        int currRow = region[currCell].row;
+        int currCol = region[currCell].column;
+
+        if(grid[currRow][currCol] == value) return; // value already solved for this region 
+
+        if((possibleValuesMask[currRow][currCol] & (1 << value)) > 0) // value can go in current cell
+        {   
+            countCandidates++;
+
+            if(countCandidates < 4) // if less than 4 candidates so far, store the current cell and keep going
+            {             
+                candidateCells[countCandidates-1] = cell(currRow, currCol);
+            }                
+            else // if there are 4+ candidates then no possible info, continue to next value
+            {
+                break;
+            }
+        }
+    } // region loop
+
+    switch(countCandidates)
+    {
+        case 1: // found where value goes
+        {
+            writeCell(candidateCells[0], value);            
+        }
+            break;
+
+        // if value only has 2 or 3 candidates in the current region that are also all in another region, we can eliminate value from other cells in that region
+        // e.g. see Step 14 here: https://www.websudoku.com/images/example-steps.html
+        case 2: // pointing pairs: https://sudoku.com/sudoku-rules/pointing-pairs/
+        {
+            // if current region is a box, check if candidates are also in the same row or column
+            if(isBox(region)) //TODO: test this
+            {
+                if(candidateCells[0].row == candidateCells[1].row) // candidates are in the same row
+                {
+                    int row = candidateCells[0].row;
+
+                    for(int currCol=0; currCol<9; ++currCol)
+                    {
+                        // clear possible value for non-candidate cells
+                        if((currCol != candidateCells[0].column) && (currCol != candidateCells[1].column))
+                        {
+                            possibleValuesMask[row][currCol] &= ~(1 << value);
+
+                            assert(possibleValuesMask[row][currCol] || grid[row][currCol]);
+                        }
+                    }
+                }
+                else if(candidateCells[0].column == candidateCells[1].column) // candidates are in the same column
+                {
+                    int column = candidateCells[0].column;
+
+                    for(int currRow=0; currRow<9; ++currRow)
+                    {
+                        // clear possible value for non-candidate cells
+                        if((currRow != candidateCells[0].row) && (currRow != candidateCells[1].row))
+                        {
+                            possibleValuesMask[currRow][column] &= ~(1 << value);
+
+                            assert(possibleValuesMask[currRow][column] || grid[currRow][column]);
+                        }
+                    }
+                }
+            }
+            else // else current region is a row or column, check if candidates are also in the same box
+            {
+                int rowOffset = 3*(candidateCells[0].row/3);
+                int colOffset = 3*(candidateCells[0].column/3);
+
+                if( (isRow(region)
+                    && (colOffset == 3*(candidateCells[1].column/3)) )
+                    ||
+                    (isColumn(region)
+                    && (rowOffset == 3*(candidateCells[1].row/3)) ))
+                    {
+                        for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
+                        {
+                            for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
+                            {
+                                // clear possible value for non-candidate cells
+                                if(((rowIt != candidateCells[0].row) || (columnIt != candidateCells[0].column))
+                                    && ((rowIt != candidateCells[1].row) || (columnIt != candidateCells[1].column)))
+                                {
+                                    possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
+
+                                    assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
+                                }
+                            }
+                        }
+                    }
+            }
+        }
+            break;
+
+        case 3: // pointing triples: https://sudoku.com/sudoku-rules/pointing-triples/
+        {
+            // if((region[0].row == region[8].row)) // if current region is a row, check if candidates are also in the same box
+            // {
+            //     int rowOffset = 3*(candidateCells[0].row/3);
+            //     int colOffset = 3*(candidateCells[0].column/3);
+
+            //     if((colOffset == 3*(candidateCells[1].column/3)) 
+            //         && (colOffset == 3*(candidateCells[2].column/3))) // candidates are in the same box
+            //     {
+            //         for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
+            //         {
+            //             for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
+            //             {
+            //                 // clear possible value for non-candidate cells
+            //                 if(((rowIt) != candidateCells[0].row))
+            //                 {
+            //                     possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
+
+            //                     assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            // else if((region[0].column == region[8].column)) // else if current region is a column, check if candidates are also in the same box
+            // {
+            //     int rowOffset = 3*(candidateCells[0].row/3);
+            //     int colOffset = 3*(candidateCells[0].column/3);
+
+            //     if((rowOffset == 3*(candidateCells[1].row/3))
+            //         && (rowOffset == 3*(candidateCells[2].row/3))) // candidates are in the same box
+            //     {
+            //         for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
+            //         {
+            //             for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
+            //             {
+            //                 // clear possible value for non-candidate cells
+            //                 if(((columnIt) != candidateCells[0].column))
+            //                 {
+            //                     possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
+
+            //                     assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            // else // else current region is a box, check if candidates are also in the same row or column
+            // {
+            //     if((candidateCells[0].row == candidateCells[1].row)
+            //         && (candidateCells[0].row == candidateCells[2].row)) // candidates are in the same row
+            //     {
+            //         int row = candidateCells[0].row;
+
+            //         for(int currCol=0; currCol<9; ++currCol)
+            //         {
+            //             // clear possible value for non-candidate cells
+            //             if((currCol != candidateCells[0].column) 
+            //                 && (currCol != candidateCells[1].column)
+            //                 && (currCol != candidateCells[2].column))
+            //             {
+            //                 possibleValuesMask[row][currCol] &= ~(1 << value);
+
+            //                 assert(possibleValuesMask[row][currCol] || grid[row][currCol]);
+            //             }
+            //         }
+            //     }
+            //     else if((candidateCells[0].column == candidateCells[1].column)
+            //             && (candidateCells[0].column == candidateCells[2].column)) // candidates are in the same column
+            //     {
+            //         int column = candidateCells[0].column;
+
+            //         for(int currRow=0; currRow<9; ++currRow)
+            //         {
+            //             // clear possible value for non-candidate cells
+            //             if((currRow != candidateCells[0].row) 
+            //                 && (currRow != candidateCells[1].row)
+            //                 && (currRow != candidateCells[2].row))
+            //             {
+            //                 possibleValuesMask[currRow][column] &= ~(1 << value);
+
+            //                 assert(possibleValuesMask[currRow][column] || grid[currRow][column]);
+            //             }
+            //         }
+            //     }
+            // }
+        }
+            break;
+        default: break; // too many candidates, no info
+    }
+}
+
+void solver::solveNextNumber()
+{
     for(int numLoops = 0; numLoops <= countToSolve; ++numLoops) // if we don't solve at least one number every iteration (after the first initialisation pass), the grid is unsolvable
     {
         // check possible values for every empty cell
@@ -637,51 +896,22 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTim
                 // try all values in the empty cell, if the grid is still valid then that value is possible
                 for(int value=1; value<=9; ++value)
                 {
-                    if(!(possibleValues[currRow][currCol] & (1 << value))) continue; // skip if we already know value is not possible
+                    if(!(possibleValuesMask[currRow][currCol] & (1 << value))) continue; // skip if we already know value is not possible
                     grid[currRow][currCol] = value;
 
                     if(!isCellValid(grid, currRow, currCol)) // if grid is now invalid remove possible value for this cell
-                        possibleValues[currRow][currCol] &= ~(1 << value); 
+                        possibleValuesMask[currRow][currCol] &= ~(1 << value); 
                 }
 
-                assert(possibleValues[currRow][currCol] != 0);
+                assert(possibleValuesMask[currRow][currCol] != 0);
 
-                if(isPowerOfTwo(possibleValues[currRow][currCol])) // if possible value is a power of 2 there is only one possible value
+                if(isPowerOfTwo(possibleValuesMask[currRow][currCol])) // if possible value is a power of 2 there is only one possible value
                 {
                     // find the correct value
-                    int value = getPowerOfTwo(possibleValues[currRow][currCol]);
+                    int value = getPowerOfTwo(possibleValuesMask[currRow][currCol]);
+                    writeCell(cell(currRow, currCol), value);
 
-                    grid[currRow][currCol] = value;
-                    possibleValues[currRow][currCol] = 0;
-
-                    assert(isCellValid(grid, currRow, currCol));
-
-                    writeGridToFile(fileOut, grid);
-
-                    ++countSolved;
-                    if(countSolved == countToSolve) return; // stop if we've solved enough cells, continue otherwise
-
-                    // we now know that value cannot go anywhere in the three regions containing the current cell; clear the appropriate bit for those cells
-                    {
-                        for(int i=0; i<9; ++i)
-                        {
-                            possibleValues[currRow][i] &= ~(1 << value); // row
-                            possibleValues[i][currCol] &= ~(1 << value); // column
-                        }
-
-                        // round down the current row and column to the nearest factor of 3
-                        int rowOffset = 3*(currRow/3);
-                        int colOffset = 3*(currCol/3);
-
-                        for(int columnIt=0; columnIt<3; ++columnIt)
-                        {
-                            for(int rowIt=0; rowIt<3; ++rowIt)
-                            {
-                                possibleValues[rowIt+rowOffset][columnIt+colOffset] &= ~(1 << value); // box
-                            }
-                        }
-                    }
-                    Sleep(sleepTimeMs);
+                    if(finished) return;
                 }
 
                 else grid[currRow][currCol] = 0; // else reset cell to empty
@@ -689,213 +919,32 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTim
         } // cell loop
 
         // search every region to see if any values can only be in one cell
-        /*for(int currRegion=0; currRegion<27; ++currRegion)
+        for(int currRow=0; currRow<9; ++currRow) // rows
         {
-            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this region
+            cell region[9];
+            for(int currCol=0; currCol<9; ++currCol)
+            { 
+               region[currCol] = cell(currRow, currCol);
+            }
+
+            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this row
             {
-                int countCandidates = 0; // number of candidate cells where value could go
-                int candidateCells[3] = {-999, -999, -999}; // co-ordinates of first 3 candidate cells
+                solveValueForRegion(value, region);
 
-                for(int currCell=0; currCell<9; ++currCell)
-                {
-                    if((possibleValues[regions[currRegion][currCell]] & (1 << value)) > 0) // value can go in currCell
-                    {   
-                        if(countCandidates < 3) // if less than 3 candidates so far, store the current cell and keep going                        
-                            candidateCells[countCandidates++] = currCell;
-                            
-                        else // if there are more than 3 candidates then no possible info, continue to next value
-                        {
-                            ++countCandidates;
-                            break;
-                        }
-                    }
-                }
-
-                switch(countCandidates)
-                {
-                    case 1: // found where value goes
-                    {
-                        int cell = regions[currRegion][candidateCells[0]];
-                        grid[cell] = value;
-                        possibleValues[cell] = 0;
-
-                        assert(isCellValid(grid, cell));
-
-                        writeGridToFile(fileOut, grid);                    
-
-                        ++countSolved;
-                        if(countSolved == countToSolve) return; // stop if we've solved enough cells, continue otherwise
-
-                        // we now know value cannot go anywhere in the three regions containing the current cell; clear the value-th bit for those cells
-                        // however we can ignore the current region - the reason we're here is because value couldn't go anywhere else there
-                        int region1, region2;
-
-                        if(isRow(currRegion)) // current region is row
-                        {
-                            region1 = getColumn(cell); // column
-                            region2 = getBox(cell); // box
-                        }
-                        else if (!isBox(currRegion)) // current region is column
-                        {
-                            region1 = getRow(cell); // row
-                            region2 = getBox(cell); // box
-                        }
-                        else // current region is box
-                        {
-                            region1 = getRow(cell); // row
-                            region2 = getColumn(cell); // column
-                        }
-
-                        for(int i=0; i<9; ++i)
-                        {
-                            possibleValues[regions[region1][i]] &= ~(1 << value);
-                            possibleValues[regions[region2][i]] &= ~(1 << value); 
-
-                            assert((possibleValues[regions[region1][i]] || grid[regions[region1][i]]));
-                            assert((possibleValues[regions[region2][i]] || grid[regions[region2][i]]));
-                        }
-                        Sleep(sleepTimeMs);
-                    }
-                        break;
-
-                    // if value only has 2 or 3 candidates in the current region that are also all in another region, we can eliminate value from other cells in that region
-                    // e.g. see Step 14 here: https://www.websudoku.com/images/example-steps.html
-                    case 2: // pointing pairs: https://sudoku.com/sudoku-rules/pointing-pairs/
-                    {
-                        // transform cells from region space to grid space
-                        int cell1 = regions[currRegion][candidateCells[0]];
-                        int cell2 = regions[currRegion][candidateCells[1]];
-
-                        if(isBox(currRegion)) // if current region is a box, check if candidates are in the same row or column
-                        {
-                            if(getRow(cell1) == getRow(cell2)) // same row
-                            {
-                                int row = getRow(cell1);
-
-                                // clear value-th bit for all other cells in row
-                                for(int i=0; i<9; ++i)
-                                {
-                                    if(regions[row][i] != cell1 
-                                    && regions[row][i] != cell2)
-                                        possibleValues[regions[row][i]] &= ~(1 << value);
-
-                                    assert(possibleValues[regions[row][i]] || grid[regions[row][i]]); 
-                                }
-                            }
-
-                            else if(getColumn(cell1) == getColumn(cell2)) // same column
-                            {
-                                int column = getColumn(cell1);
-
-                                // clear value-th bit for all other cells in column
-                                for(int i=0; i<9; ++i)
-                                {
-                                    if(regions[column][i] != cell1 
-                                    && regions[column][i] != cell2)
-                                        possibleValues[regions[column][i]] &= ~(1 << value);
-                                
-                                    assert(possibleValues[regions[column][i]] || grid[regions[column][i]]);
-                                }
-                            }
-                        }
-                        else // else current region is a row or column, check if candidates are in the same box
-                        {
-                            int box = getBox(cell1);
-
-                            if(box == getBox(cell2)) // same box
-                            {
-                                // clear value-th bit for all other cells in box
-                                for(int i=0; i<9; ++i)
-                                {
-                                    if(regions[box][i] != cell1 
-                                    && regions[box][i] != cell2)
-                                        possibleValues[regions[box][i]] &= ~(1 << value);
-
-                                    assert(possibleValues[regions[box][i]] || grid[regions[box][i]]);
-                                }
-                            }
-                        }
-                    }
-                        break;
-
-                    case 3: // pointing triples: https://sudoku.com/sudoku-rules/pointing-triples/
-                    {
-                        // transform cells from region space to grid space
-                        int cell1 = regions[currRegion][candidateCells[0]];
-                        int cell2 = regions[currRegion][candidateCells[1]];
-                        int cell3 = regions[currRegion][candidateCells[2]];
-
-                        if(isBox(currRegion)) // if current region is a box, check if candidates are in the same row or column
-                        {
-                            if((getRow(cell1) == getRow(cell2))
-                                && getRow(cell1) == getRow(cell3)) // same row
-                            {
-                                int row = getRow(cell1);
-
-                                // clear value-th bit for all other cells in row
-                                for(int i=0; i<9; ++i)
-                                {
-                                    if(regions[row][i] != cell1 
-                                    && regions[row][i] != cell2
-                                    && regions[row][i] != cell3)
-                                        possibleValues[regions[row][i]] &= ~(1 << value);
-
-                                    assert(possibleValues[regions[row][i]] || grid[regions[row][i]]); 
-                                }
-                            }
-
-                            else if((getColumn(cell1) == getColumn(cell2))
-                                && (getColumn(cell1) == getColumn(cell3))) // same column
-                            {
-                                int column = getColumn(cell1);
-
-                                // clear value-th bit for all other cells in column
-                                for(int i=0; i<9; ++i)
-                                {
-                                    if(regions[column][i] != cell1 
-                                    && regions[column][i] != cell2
-                                    && regions[column][i] != cell3)
-                                        possibleValues[regions[column][i]] &= ~(1 << value);
-                                
-                                    assert(possibleValues[regions[column][i]] || grid[regions[column][i]]);
-                                }
-                            }
-                        }
-                        else // else current region is a row or column, check if candidates are in the same box
-                        {
-                            int box = getBox(cell1);
-
-                            if(box == getBox(cell2) && box == getBox(cell3)) // same box
-                            {
-                                // clear value-th bit for all other cells in box
-                                for(int i=0; i<9; ++i)
-                                {
-                                    if(regions[box][i] != cell1 
-                                    && regions[box][i] != cell2
-                                    && regions[box][i] != cell3)
-                                        possibleValues[regions[box][i]] &= ~(1 << value);
-
-                                    assert(possibleValues[regions[box][i]] || grid[regions[box][i]]);
-                                }
-                            }
-                        }
-                    }
-                        break;
-                    default: break; // too many candidates, no info
-                }
+                if(finished) return; // stop if we've solved enough cells, continue otherwise
             } // value loop
 
-            for(int firstCell=0; firstCell<9; ++firstCell) // look for hidden pairs: https://sudoku.com/sudoku-rules/hidden-pairs/
+            /*for(int firstCell=0; firstCell<9; ++firstCell) // look for hidden pairs: https://sudoku.com/sudoku-rules/hidden-pairs/
             {
-                if(grid[regions[currRegion][firstCell]] != 0) continue; // ignore completed cells
+                if(grid[currRow][firstCell] != 0) continue; // ignore completed cells
 
                 for(int secondCell = firstCell+1; secondCell<9; ++secondCell)
                 {
-                    if(grid[regions[currRegion][secondCell]] != 0) continue; // ignore completed cells
+                    if(grid[currRow][secondCell] != 0) continue; // ignore completed cells
 
                     // store the values that could possibly be in both cells
-                    int16_t possibleValuesCommon = possibleValues[regions[currRegion][firstCell]] 
-                                                & possibleValues[regions[currRegion][secondCell]];
+                    int16_t possibleValuesCommon = possibleValuesMask[currRow][firstCell] 
+                                                & possibleValuesMask[currRow][secondCell];
 
                     // now store all the values that could possibly be in the other 7 cells
                     int16_t possibleValuesOther = 0;
@@ -903,7 +952,7 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTim
                     for(int otherCell=0; otherCell<9; ++otherCell)
                     {
                         if(otherCell != firstCell && otherCell != secondCell)
-                            possibleValuesOther |= possibleValues[regions[currRegion][otherCell]];
+                            possibleValuesOther |= possibleValuesMask[currRow][otherCell];
                     }
 
                     // find the bits that are set in common but not other, i.e. the values that can only go in firstCell and secondCell
@@ -913,13 +962,67 @@ void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTim
                     // then they MUST go in those 2 cells. All other possibilities can be cleared
                     if(getCountBitsSet(possibleValuesCommon) == 2)
                     {
-                        possibleValues[regions[currRegion][firstCell]] = possibleValuesCommon;
-                        possibleValues[regions[currRegion][secondCell]] = possibleValuesCommon;
+                        possibleValuesMask[currRow][firstCell] = possibleValuesCommon;
+                        possibleValuesMask[currRow][secondCell] = possibleValuesCommon;
                         break; // continue to next value for firstCell
                     }
+                    else for(int thirdCell = secondCell+1; thirdCell<9; ++thirdCell) // no hidden pair, but keep looking for hidden triples: https://sudoku.com/sudoku-rules/hidden-triples/
+                    {
+                        if(grid[currRow][thirdCell] != 0) continue; // ignore completed cells
+
+                        // store the values that could possibly be in both cells
+                        possibleValuesCommon = possibleValuesMask[currRow][firstCell] 
+                                                & possibleValuesMask[currRow][secondCell]
+                                                & possibleValuesMask[currRow][thirdCell];
+
+                        // now store all the values that could possibly be in the other 6 cells
+                        possibleValuesOther = 0;
+
+                        for(int otherCell=0; otherCell<9; ++otherCell)
+                        {
+                            if(otherCell != firstCell && otherCell != secondCell && otherCell != thirdCell)
+                                possibleValuesOther |= possibleValuesMask[currRow][otherCell];
+                        }
+
+                        // find the bits that are set in common but not other, i.e. the values that can only go in firstCell and secondCell
+                        possibleValuesCommon &= ~possibleValuesOther;
+
+                        // if there are 2 bits set, i.e. 2 values that can only go in firstCell and secondCell,
+                        // then they MUST go in those 2 cells. All other possibilities can be cleared
+                        if(getCountBitsSet(possibleValuesCommon) == 3)
+                        {
+                            possibleValuesMask[currRow][firstCell] &= possibleValuesCommon;
+                            possibleValuesMask[currRow][secondCell] &= possibleValuesCommon;
+                            possibleValuesMask[currRow][thirdCell] &= possibleValuesCommon;
+                            break; // continue to next value for secondCell
+                        }
+                    }
                 }
+            }*/
+        } // row loop
+
+        for(int currCol=0; currCol<9; ++currCol) // columns
+        {
+            cell region[9];
+            for(int currRow=0; currRow<9; ++currRow)
+            { 
+               region[currRow] = cell(currRow, currCol);
             }
-        } // region loop
-    */
-   }
+
+            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this row
+            {
+                solveValueForRegion(value, region);
+
+                if(finished) return; // stop if we've solved enough cells, continue otherwise
+            } // value loop
+
+            // look for hidden pairs
+        } // column loop
+    }
+}
+
+void solveNextNumber(char *fileIn, char *fileOut, int countToSolve, int sleepTimeMs) // solves next N cells in the grid
+{
+    solver solver(fileIn, fileOut, countToSolve, sleepTimeMs);
+    solver.solveNextNumber();
 }
