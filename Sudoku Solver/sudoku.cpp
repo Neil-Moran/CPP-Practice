@@ -10,63 +10,6 @@
 // Glossary of Sudoku Terms:
 // https://en.wikipedia.org/wiki/Glossary_of_Sudoku
 
-// hard code the co-ordinates of all regions (row, column or box)
-static int regions[27][9] = {
-    // 0-8: rows
-    {0, 1, 2, 3, 4, 5, 6, 7, 8},
-    {9, 10, 11, 12, 13, 14, 15, 16, 17},
-    {18, 19, 20, 21, 22, 23, 24, 25, 26},
-    {27, 28, 29, 30, 31, 32, 33, 34, 35},
-    {36, 37, 38, 39, 40, 41, 42, 43, 44},
-    {45, 46, 47, 48, 49, 50, 51, 52, 53},
-    {54, 55, 56, 57, 58, 59, 60, 61, 62},
-    {63, 64, 65, 66, 67, 68, 69, 70, 71},
-    {72, 73, 74, 75, 76, 77, 78, 79, 80},
-    // 9-17: columns
-    {0, 9, 18, 27, 36, 45, 54, 63, 72},
-    {1, 10, 19, 28, 37, 46, 55, 64, 73},
-    {2, 11, 20, 29, 38, 47, 56, 65, 74},
-    {3, 12, 21, 30, 39, 48, 57, 66, 75},
-    {4, 13, 22, 31, 40, 49, 58, 67, 76},
-    {5, 14, 23, 32, 41, 50, 59, 68, 77},
-    {6, 15, 24, 33, 42, 51, 60, 69, 78},
-    {7, 16, 25, 34, 43, 52, 61, 70, 79},
-    {8, 17, 26, 35, 44, 53, 62, 71, 80},
-    // 18-26: boxes
-    {0, 1, 2, 9, 10, 11, 18, 19, 20},
-    {3, 4, 5, 12, 13, 14, 21, 22, 23},
-    {6, 7, 8, 15, 16, 17, 24, 25, 26},
-    {27, 28, 29, 36, 37, 38, 45, 46, 47},
-    {30, 31, 32, 39, 40, 41, 48, 49, 50},
-    {33, 34, 35, 42, 43, 44, 51, 52, 53},
-    {54, 55, 56, 63, 64, 65, 72, 73, 74},
-    {57, 58, 59, 66, 67, 68, 75, 76, 77},
-    {60, 61, 62, 69, 70, 71, 78, 79, 80}
-    // derivation of regions:
-    /*
-    for(int i=0; i<9; ++i)
-    {
-        for(int j=0; j<9; ++j)
-        {
-            regions[i][j] = 9*i + j; // co-ordinates for rows
-            regions[9+i][j] = i + 9*j; //co-ordinates for columns
-
-            // mutate such that i = 0 1 2 9 10 11 18 19 20
-            int k = i;
-            if(i >= 6) k += 12;
-            else if(i >= 3) k += 6;
-
-            // mutate such that j = 0 1 2 9 10 11 18 19 20
-            int l = j;
-            if(j >= 6) l += 12;
-            else if(j >= 3) l += 6;
-
-            regions[18+i][j] = 3*k + l; //co-ordinates for boxes
-        }
-    }
-    */
-};
-
 inline int getRow(int cell) // returns the row of the specified cell
 {
     return cell/9;
@@ -881,6 +824,40 @@ void solver::solveValueForRegion(int value, cell region[]) // checks where speci
 
 void solver::solveNextNumber()
 {
+    cell regions[27][9] = 
+    {
+        //rows
+        {cell(0,0), cell(0,1), cell(0,2), cell(0,3), cell(0,4), cell(0,5), cell(0,6), cell(0,7), cell(0,8)},
+        {cell(1,0), cell(1,1), cell(1,2), cell(1,3), cell(1,4), cell(1,5), cell(1,6), cell(1,7), cell(1,8)},
+        {cell(2,0), cell(2,1), cell(2,2), cell(2,3), cell(2,4), cell(2,5), cell(2,6), cell(2,7), cell(2,8)},
+        {cell(3,0), cell(3,1), cell(3,2), cell(3,3), cell(3,4), cell(3,5), cell(3,6), cell(3,7), cell(3,8)},
+        {cell(4,0), cell(4,1), cell(4,2), cell(4,3), cell(4,4), cell(4,5), cell(4,6), cell(4,7), cell(4,8)},
+        {cell(5,0), cell(5,1), cell(5,2), cell(5,3), cell(5,4), cell(5,5), cell(5,6), cell(5,7), cell(5,8)},
+        {cell(6,0), cell(6,1), cell(6,2), cell(6,3), cell(6,4), cell(6,5), cell(6,6), cell(6,7), cell(6,8)},
+        {cell(7,0), cell(7,1), cell(7,2), cell(7,3), cell(7,4), cell(7,5), cell(7,6), cell(7,7), cell(7,8)},
+        {cell(8,0), cell(8,1), cell(8,2), cell(8,3), cell(8,4), cell(8,5), cell(8,6), cell(8,7), cell(8,8)},
+        //columns
+        {cell(0,0), cell(1,0), cell(2,0), cell(3,0), cell(4,0), cell(5,0), cell(6,0), cell(7,0), cell(8,0)},
+        {cell(0,1), cell(1,1), cell(2,1), cell(3,1), cell(4,1), cell(5,1), cell(6,1), cell(7,1), cell(8,1)},
+        {cell(0,2), cell(1,2), cell(2,2), cell(3,2), cell(4,2), cell(5,2), cell(6,2), cell(7,2), cell(8,2)},
+        {cell(0,3), cell(1,3), cell(2,3), cell(3,3), cell(4,3), cell(5,3), cell(6,3), cell(7,3), cell(8,3)},
+        {cell(0,4), cell(1,4), cell(2,4), cell(3,4), cell(4,4), cell(5,4), cell(6,4), cell(7,4), cell(8,4)},
+        {cell(0,5), cell(1,5), cell(2,5), cell(3,5), cell(4,5), cell(5,5), cell(6,5), cell(7,5), cell(8,5)},
+        {cell(0,6), cell(1,6), cell(2,6), cell(3,6), cell(4,6), cell(5,6), cell(6,6), cell(7,6), cell(8,6)},
+        {cell(0,7), cell(1,7), cell(2,7), cell(3,7), cell(4,7), cell(5,7), cell(6,7), cell(7,7), cell(8,7)},
+        {cell(0,8), cell(1,8), cell(2,8), cell(3,8), cell(4,8), cell(5,8), cell(6,8), cell(7,8), cell(8,8)},
+        //boxes
+        {cell(0,0), cell(0,1), cell(0,2), cell(1,0), cell(1,1), cell(1,2), cell(2,0), cell(2,1), cell(2,2)},
+        {cell(0,3), cell(0,4), cell(0,5), cell(1,3), cell(1,4), cell(1,5), cell(2,3), cell(2,4), cell(2,5)},
+        {cell(0,6), cell(0,7), cell(0,8), cell(1,6), cell(1,7), cell(1,8), cell(2,6), cell(2,7), cell(2,8)},
+        {cell(3,0), cell(3,1), cell(3,2), cell(4,0), cell(4,1), cell(4,2), cell(5,0), cell(5,1), cell(5,2)},
+        {cell(3,3), cell(3,4), cell(3,5), cell(4,3), cell(4,4), cell(4,5), cell(5,3), cell(5,4), cell(5,5)},
+        {cell(3,6), cell(3,7), cell(3,8), cell(4,6), cell(4,7), cell(4,8), cell(5,6), cell(5,7), cell(5,8)},
+        {cell(6,0), cell(6,1), cell(6,2), cell(7,0), cell(7,1), cell(7,2), cell(8,0), cell(8,1), cell(8,2)},
+        {cell(6,3), cell(6,4), cell(6,5), cell(7,3), cell(7,4), cell(7,5), cell(8,3), cell(8,4), cell(8,5)},
+        {cell(6,6), cell(6,7), cell(6,8), cell(7,6), cell(7,7), cell(7,8), cell(8,6), cell(8,7), cell(8,8)}
+    };
+
     for(int numLoops = 0; numLoops <= countToSolve; ++numLoops) // if we don't solve at least one number every iteration (after the first initialisation pass), the grid is unsolvable
     {
         // check possible values for every empty cell
@@ -916,17 +893,11 @@ void solver::solveNextNumber()
         } // cell loop
 
         // search every region to see if any values can only be in one cell
-        for(int currRow=0; currRow<9; ++currRow) // rows
+        for(int currRegion=0; currRegion<27; ++currRegion) 
         {
-            cell region[9];
-            for(int currCol=0; currCol<9; ++currCol)
-            { 
-               region[currCol] = cell(currRow, currCol);
-            }
-
-            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this row
+            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this column
             {
-                solveValueForRegion(value, region);
+                solveValueForRegion(value, regions[currRegion]);
 
                 if(finished) return; // stop if we've solved enough cells, continue otherwise
             } // value loop
@@ -996,49 +967,6 @@ void solver::solveNextNumber()
                     }
                 }
             }*/
-        } // row loop
-
-        for(int currCol=0; currCol<9; ++currCol) // columns
-        {
-            cell region[9];
-            for(int currRow=0; currRow<9; ++currRow)
-            { 
-               region[currRow] = cell(currRow, currCol);
-            }
-
-            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this column
-            {
-                solveValueForRegion(value, region);
-
-                if(finished) return; // stop if we've solved enough cells, continue otherwise
-            } // value loop
-
-            // look for hidden pairs
-        } // column loop
-
-        cell box[9][9] = 
-        {
-            {cell(0,0), cell(0,1), cell(0,2), cell(1,0), cell(1,1), cell(1,2), cell(2,0), cell(2,1), cell(2,2)},
-            {cell(0,3), cell(0,4), cell(0,5), cell(1,3), cell(1,4), cell(1,5), cell(2,3), cell(2,4), cell(2,5)},
-            {cell(0,6), cell(0,7), cell(0,8), cell(1,6), cell(1,7), cell(1,8), cell(2,6), cell(2,7), cell(2,8)},
-            {cell(3,0), cell(3,1), cell(3,2), cell(4,0), cell(4,1), cell(4,2), cell(5,0), cell(5,1), cell(5,2)},
-            {cell(3,3), cell(3,4), cell(3,5), cell(4,3), cell(4,4), cell(4,5), cell(5,3), cell(5,4), cell(5,5)},
-            {cell(3,6), cell(3,7), cell(3,8), cell(4,6), cell(4,7), cell(4,8), cell(5,6), cell(5,7), cell(5,8)},
-            {cell(6,0), cell(6,1), cell(6,2), cell(7,0), cell(7,1), cell(7,2), cell(8,0), cell(8,1), cell(8,2)},
-            {cell(6,3), cell(6,4), cell(6,5), cell(7,3), cell(7,4), cell(7,5), cell(8,3), cell(8,4), cell(8,5)},
-            {cell(6,6), cell(6,7), cell(6,8), cell(7,6), cell(7,7), cell(7,8), cell(8,6), cell(8,7), cell(8,8)}
-        };
-
-        for(int currBox=0; currBox<9; ++currBox) // boxes
-        {
-            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this column
-            {
-                solveValueForRegion(value, box[currBox]);
-
-                if(finished) return; // stop if we've solved enough cells, continue otherwise
-            } // value loop
-
-            // look for hidden pairs
         } // box loop
     }
 }
