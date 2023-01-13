@@ -29,6 +29,7 @@ struct solver
     solver(char *fileIn, char *fileOut, int countToSolve, int sleepTimeMs);
     void write();
     void writeCell(cell cell, int value);
-    void solveValueForRegion(int value, cell region[]);
+    void solveValueForRegion(int value, cell region[9]);
+    void findHiddenPairs(cell region[9]);
     void solveNextNumber();
 };

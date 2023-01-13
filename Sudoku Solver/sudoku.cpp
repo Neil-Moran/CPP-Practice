@@ -619,7 +619,7 @@ void solver::writeCell(cell cell, int value) // enter value into cell and write 
     Sleep(sleepTimeMs); // sleep if desired, for an animated solve effect!
 }
 
-void solver::solveValueForRegion(int value, cell region[]) // checks where specified value could go in the specified region, and updates grid or possible values accordingly
+void solver::solveValueForRegion(int value, cell region[9]) // checks where specified value could go in the specified region, and updates grid or possible values accordingly
 {
     int countCandidates = 0; // number of candidate cells where value could go
     cell candidateCells[3]; // co-ordinates of first 3 candidate cells
@@ -792,6 +792,84 @@ void solver::solveValueForRegion(int value, cell region[]) // checks where speci
     }
 }
 
+void solver::findHiddenPairs(cell region[9]) // search the specified region for hidden pairs: https://sudoku.com/sudoku-rules/hidden-pairs/
+{
+    for(int cellA=0; cellA<9; ++cellA) 
+    {
+        int cellARow = region[cellA].row;
+        int cellACol = region[cellA].column;
+
+        if(grid[cellARow][cellACol] != 0) continue; // ignore completed cells
+
+        for(int cellB = cellA+1; cellB<9; ++cellB)
+        {
+            int cellBRow = region[cellB].row;
+            int cellBCol = region[cellB].column;
+            
+            if(grid[cellBRow][cellBCol] != 0) continue; // ignore completed cells
+
+            // store the values that could possibly be in both cells
+            int16_t possibleValuesCommon = possibleValuesMask[cellARow][cellACol] 
+                                        & possibleValuesMask[cellBRow][cellBCol];
+
+            // now store all the values that could possibly be in the other 7 cells
+            int16_t possibleValuesOther = 0;
+
+            for(int otherCell=0; otherCell<9; ++otherCell)
+            {
+                if(otherCell != cellA && otherCell != cellB)
+                    possibleValuesOther |= possibleValuesMask[region[otherCell].row][region[otherCell].column];
+            }
+            
+            // find the bits that are set in common but not other, i.e. the values that can only go in cellA and cellB
+            possibleValuesCommon &= ~possibleValuesOther;
+
+            // if there are 2 bits set, i.e. 2 values that can only go in cellA and cellB,
+            // then they MUST go in those 2 cells. All other possibilities can be cleared
+            if(getCountBitsSet(possibleValuesCommon) == 2)
+            {
+                possibleValuesMask[cellARow][cellACol] = possibleValuesCommon;
+                possibleValuesMask[cellBRow][cellBCol] = possibleValuesCommon;
+                break; // continue to next value for cellA
+            }
+            else for(int cellC = cellB+1; cellC<9; ++cellC) // no hidden pair, but keep looking for hidden triples: https://sudoku.com/sudoku-rules/hidden-triples/
+            {
+                int cellCRow = region[cellC].row;
+                int cellCCol = region[cellC].column;
+
+                if(grid[cellCRow][cellCCol] != 0) continue; // ignore completed cells
+
+                // store the values that could possibly be in all three cells
+                possibleValuesCommon = possibleValuesMask[cellARow][cellACol] 
+                                        & possibleValuesMask[cellBRow][cellBCol]
+                                        & possibleValuesMask[cellCRow][cellCCol];
+
+                // now store all the values that could possibly be in the other 6 cells
+                possibleValuesOther = 0;
+
+                for(int otherCell=0; otherCell<9; ++otherCell)
+                {
+                    if(otherCell != cellA && otherCell != cellB && otherCell != cellC)
+                        possibleValuesOther |= possibleValuesMask[region[otherCell].row][region[otherCell].column];
+                }
+
+                // find the bits that are set in common but not other, i.e. the values that can only go in cellA, cellB and cellC
+                possibleValuesCommon &= ~possibleValuesOther;
+
+                // if there are 3 bits set, i.e. 3 values that can only go in cellA, cellB, and cellC,
+                // then they MUST go in those 3 cells. All other possibilities can be cleared
+                if(getCountBitsSet(possibleValuesCommon) == 3)
+                {
+                    possibleValuesMask[cellARow][cellACol] &= possibleValuesCommon;
+                    possibleValuesMask[cellBRow][cellBCol] &= possibleValuesCommon;
+                    possibleValuesMask[cellCRow][cellCCol] &= possibleValuesCommon;
+                    break; // continue to next value for cellB
+                }
+            }
+        }
+    }
+}
+
 void solver::solveNextNumber()
 {
     cell regions[27][9] = 
@@ -865,79 +943,16 @@ void solver::solveNextNumber()
         // search every region to see if any values can only be in one cell
         for(int currRegion=0; currRegion<27; ++currRegion) 
         {
-            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this column
+            for(int value=1; value<=9; ++value) // see if we can solve any of the numbers 1-9 for this region
             {
                 solveValueForRegion(value, regions[currRegion]);
 
                 if(finished) return; // stop if we've solved enough cells, continue otherwise
             } // value loop
 
-            /*for(int firstCell=0; firstCell<9; ++firstCell) // look for hidden pairs: https://sudoku.com/sudoku-rules/hidden-pairs/
-            {
-                if(grid[currRow][firstCell] != 0) continue; // ignore completed cells
+            findHiddenPairs(regions[currRegion]); // look for hidden pairs
 
-                for(int secondCell = firstCell+1; secondCell<9; ++secondCell)
-                {
-                    if(grid[currRow][secondCell] != 0) continue; // ignore completed cells
-
-                    // store the values that could possibly be in both cells
-                    int16_t possibleValuesCommon = possibleValuesMask[currRow][firstCell] 
-                                                & possibleValuesMask[currRow][secondCell];
-
-                    // now store all the values that could possibly be in the other 7 cells
-                    int16_t possibleValuesOther = 0;
-
-                    for(int otherCell=0; otherCell<9; ++otherCell)
-                    {
-                        if(otherCell != firstCell && otherCell != secondCell)
-                            possibleValuesOther |= possibleValuesMask[currRow][otherCell];
-                    }
-
-                    // find the bits that are set in common but not other, i.e. the values that can only go in firstCell and secondCell
-                    possibleValuesCommon &= ~possibleValuesOther;
-
-                    // if there are 2 bits set, i.e. 2 values that can only go in firstCell and secondCell,
-                    // then they MUST go in those 2 cells. All other possibilities can be cleared
-                    if(getCountBitsSet(possibleValuesCommon) == 2)
-                    {
-                        possibleValuesMask[currRow][firstCell] = possibleValuesCommon;
-                        possibleValuesMask[currRow][secondCell] = possibleValuesCommon;
-                        break; // continue to next value for firstCell
-                    }
-                    else for(int thirdCell = secondCell+1; thirdCell<9; ++thirdCell) // no hidden pair, but keep looking for hidden triples: https://sudoku.com/sudoku-rules/hidden-triples/
-                    {
-                        if(grid[currRow][thirdCell] != 0) continue; // ignore completed cells
-
-                        // store the values that could possibly be in both cells
-                        possibleValuesCommon = possibleValuesMask[currRow][firstCell] 
-                                                & possibleValuesMask[currRow][secondCell]
-                                                & possibleValuesMask[currRow][thirdCell];
-
-                        // now store all the values that could possibly be in the other 6 cells
-                        possibleValuesOther = 0;
-
-                        for(int otherCell=0; otherCell<9; ++otherCell)
-                        {
-                            if(otherCell != firstCell && otherCell != secondCell && otherCell != thirdCell)
-                                possibleValuesOther |= possibleValuesMask[currRow][otherCell];
-                        }
-
-                        // find the bits that are set in common but not other, i.e. the values that can only go in firstCell and secondCell
-                        possibleValuesCommon &= ~possibleValuesOther;
-
-                        // if there are 2 bits set, i.e. 2 values that can only go in firstCell and secondCell,
-                        // then they MUST go in those 2 cells. All other possibilities can be cleared
-                        if(getCountBitsSet(possibleValuesCommon) == 3)
-                        {
-                            possibleValuesMask[currRow][firstCell] &= possibleValuesCommon;
-                            possibleValuesMask[currRow][secondCell] &= possibleValuesCommon;
-                            possibleValuesMask[currRow][thirdCell] &= possibleValuesCommon;
-                            break; // continue to next value for secondCell
-                        }
-                    }
-                }
-            }*/
-        } // box loop
+        } // region loop
     }
 }
 
