@@ -18,10 +18,10 @@ struct cell
 
 struct solver
 {
-    solver(char *fileIn, char *fileOut, int sleepTimeMs = 0);
+    solver(char *fileIn, char *fileOut);
     
     void solveFull();
-    void solveN(int8_t N = 1);
+    void solveN(int8_t N = 1, int SLEEP_TIME_MS = 0);
 
     private:
     int8_t grid[9][9];
@@ -31,7 +31,6 @@ struct solver
     int8_t countSolved;
     int8_t countToSolve;
     int sleepTimeMs;
-    bool invalid;
     bool finished;
     
     void fillGridFromFile(char* fileIn);

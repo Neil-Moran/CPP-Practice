@@ -18,8 +18,8 @@ void solve(char *fileIn, char *fileOut) // attempts to solve the grid from the i
 
 void solveN(char *fileIn, char *fileOut, int8_t countToSolve, int sleepTimeMs) // solves next N cells in the grid
 {
-    solver solver(fileIn, fileOut, sleepTimeMs);
-    solver.solveN(countToSolve);
+    solver solver(fileIn, fileOut);
+    solver.solveN(countToSolve, sleepTimeMs);
 }
 
 inline bool isRow(cell region[8]) // returns true if the region is a row
@@ -374,7 +374,7 @@ inline bool isCellValid(int8_t grid[9][9], int8_t row, int8_t column) // checks 
     else return false;
 }
 
-solver::solver(char *fileIn, char *fileOut, int sleepTimeMs)
+solver::solver(char *fileIn, char *fileOut)
 {
     file = fileOut;
     
@@ -385,18 +385,9 @@ solver::solver(char *fileIn, char *fileOut, int sleepTimeMs)
         writeResult(); // write "result" to output file
         return;
     }
-
-    if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
-    {
-        invalid = true;
-
-        writeError("Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
-        return;
-    }            
     
     countSolved = 0;
     finished = false;
-    this->sleepTimeMs = sleepTimeMs;
 
     for(int8_t row=0; row<9; ++row) // initialise possible values
     {
@@ -411,7 +402,11 @@ solver::solver(char *fileIn, char *fileOut, int sleepTimeMs)
 
 void solver::solveFull()
 {
-    if(invalid) return; // grid is invalid, cannot solve
+    if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
+    {
+        writeError("Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
+        return;
+    }     
 
     bool solved = bruteForceSolve();
 
@@ -423,12 +418,17 @@ void solver::solveFull()
     else writeResult(); // write result to output file   
 }
 
-void solver::solveN(int8_t N)
+void solver::solveN(int8_t N, int SLEEP_TIME_MS)
 {
-    if(invalid) return; // grid is invalid, cannot solve
+    if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
+    {
+        writeError("Could not solve the specified grid as it violates the constraints of Sudoku - found the same number more than once in a row, column or box.");
+        return;
+    }
 
     countToSolve = N;
-    if(countToSolve > countUnsolved) countToSolve = countUnsolved; 
+    if(countToSolve > countUnsolved) countToSolve = countUnsolved;
+    sleepTimeMs = SLEEP_TIME_MS;
 
     cell regions[27][9] = 
     {
