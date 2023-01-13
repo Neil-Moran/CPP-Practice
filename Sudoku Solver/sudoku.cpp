@@ -39,117 +39,44 @@ inline bool isBox(cell region[8]) // returns true if the region is a box
 
 bool isValid(int8_t grid[9][9]) // checks that the grid does not violate Sudoku constraints, but does not check for solvability
 {
-    // we will check each group (row, column or box) and verify no number appears more than once
-    int8_t countOnes, countTwos, countThrees, countFours, countFives, countSixes, countSevens, countEights, countNines;
+    // we will check each region (row, column or box) and verify no number appears more than once
+
+    // the count of each value is stored in valuesHistogram
+    // e.g. valuesHistogram[2] stores the number of 2s in the region 
+    // ([0] is unused so that the indices and values match)
 
     /* --- CHECK ROWS ARE VALID --- */
     for(int8_t row=0; row<9; ++row)
     {
-        countOnes = 0;
-        countTwos = 0;
-        countThrees = 0;
-        countFours = 0;
-        countFives = 0;
-        countSixes = 0;
-        countSevens = 0;
-        countEights = 0;
-        countNines = 0;
+        int8_t valuesHistogram[10] = {0,0,0,0,0,0,0,0,0,0};
         
         for(int8_t column=0; column<9; ++column)
         {
-            switch (grid[row][column])
-            {
-            case 1:
-                ++countOnes;
-                break;
-            case 2:
-                ++countTwos;
-                break;
-            case 3:
-                ++countThrees;
-                break;
-            case 4:
-                ++countFours;
-                break;
-            case 5:
-                ++countFives;
-                break;
-            case 6:
-                ++countSixes;
-                break;
-            case 7:
-                ++countSevens;
-                break;
-            case 8:
-                ++countEights;
-                break;
-            case 9:
-                ++countNines;
-                break;            
-            default: // 0 or junk value
-                break;
-            }
+            if(grid[row][column] > 0 && grid[row][column] < 10)
+                ++valuesHistogram[grid[row][column]];
         }
 
-        // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
-        if((countOnes | countTwos | countThrees
-            | countFours | countFives | countSixes 
-            | countSevens | countEights | countNines) > 1) return false;
+        // hack to see if any are > 1: all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+        if((valuesHistogram[1] | valuesHistogram[2] | valuesHistogram[3]
+            | valuesHistogram[4] | valuesHistogram[5] | valuesHistogram[6] 
+            | valuesHistogram[7] | valuesHistogram[8] | valuesHistogram[9]) > 1) return false;
     }
 
     /* --- CHECK COLUMNS ARE VALID --- */
     for(int8_t column=0; column<9; ++column)
     {
-        countOnes = 0;
-        countTwos = 0;
-        countThrees = 0;
-        countFours = 0;
-        countFives = 0;
-        countSixes = 0;
-        countSevens = 0;
-        countEights = 0;
-        countNines = 0;
+        int8_t valuesHistogram[10] = {0,0,0,0,0,0,0,0,0,0};
         
         for(int8_t row=0; row<9; ++row)
         {
-            switch (grid[row][column])
-            {
-            case 1:
-                ++countOnes;
-                break;
-            case 2:
-                ++countTwos;
-                break;
-            case 3:
-                ++countThrees;
-                break;
-            case 4:
-                ++countFours;
-                break;
-            case 5:
-                ++countFives;
-                break;
-            case 6:
-                ++countSixes;
-                break;
-            case 7:
-                ++countSevens;
-                break;
-            case 8:
-                ++countEights;
-                break;
-            case 9:
-                ++countNines;
-                break;            
-            default: // 0 or junk value
-                break;
-            }
+            if(grid[row][column] > 0 && grid[row][column] < 10)
+                ++valuesHistogram[grid[row][column]];
         }
         
-        // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
-        if((countOnes | countTwos | countThrees
-            | countFours | countFives | countSixes 
-            | countSevens | countEights | countNines) > 1) return false;
+        // hack to see if any are > 1: all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+        if((valuesHistogram[1] | valuesHistogram[2] | valuesHistogram[3]
+            | valuesHistogram[4] | valuesHistogram[5] | valuesHistogram[6] 
+            | valuesHistogram[7] | valuesHistogram[8] | valuesHistogram[9]) > 1) return false;
     }
 
     /* --- CHECK BOXES ARE VALID --- */
@@ -157,164 +84,58 @@ bool isValid(int8_t grid[9][9]) // checks that the grid does not violate Sudoku 
     {
         for(int8_t colOffset=0; colOffset<=6; colOffset+=3)
         {
-            countOnes = 0;
-            countTwos = 0;
-            countThrees = 0;
-            countFours = 0;
-            countFives = 0;
-            countSixes = 0;
-            countSevens = 0;
-            countEights = 0;
-            countNines = 0;
+            int8_t valuesHistogram[10] = {0,0,0,0,0,0,0,0,0,0};
 
             for(int8_t row=rowOffset; row<3+rowOffset; ++row)
             {
                 for(int8_t column=colOffset; column<3+colOffset; ++column)
                 {
-                    switch (grid[row][column])
-                    {
-                    case 1:
-                        ++countOnes;
-                        break;
-                    case 2:
-                        ++countTwos;
-                        break;
-                    case 3:
-                        ++countThrees;
-                        break;
-                    case 4:
-                        ++countFours;
-                        break;
-                    case 5:
-                        ++countFives;
-                        break;
-                    case 6:
-                        ++countSixes;
-                        break;
-                    case 7:
-                        ++countSevens;
-                        break;
-                    case 8:
-                        ++countEights;
-                        break;
-                    case 9:
-                        ++countNines;
-                        break;            
-                    default: // 0 or junk value
-                        break;
-                    }
+                    if(grid[row][column] > 0 && grid[row][column] < 10)
+                        ++valuesHistogram[grid[row][column]];
                 }
             }
 
-            // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
-            if((countOnes | countTwos | countThrees
-                | countFours | countFives | countSixes 
-                | countSevens | countEights | countNines) > 1) return false;            
+        // hack to see if any are > 1: all values should be 0 or 1, so OR-ing them should be 0 or 1 also
+        if((valuesHistogram[1] | valuesHistogram[2] | valuesHistogram[3]
+            | valuesHistogram[4] | valuesHistogram[5] | valuesHistogram[6] 
+            | valuesHistogram[7] | valuesHistogram[8] | valuesHistogram[9]) > 1) return false;    
         }
     }
 
     return true; // grid is valid if we made it here
 }
 
-bool isRowValid(int8_t grid[9][9], int8_t row) // checks that the specified row does not violate Sudoku constraints
+bool isRowValid(int8_t grid[9][9], int8_t row, int8_t value) // checks that the specified value does not appear more than once in the specified row
 {
-    int8_t countOnes = 0, countTwos = 0, countThrees = 0, countFours = 0, countFives = 0, countSixes = 0, countSevens = 0, countEights = 0, countNines = 0;
+    int8_t countValue = 0; // number of occurences of value in the row
 
     for(int8_t column=0; column<9; ++column)
     {
-        switch (grid[row][column])
+        if(grid[row][column] == value)
         {
-            case 1:
-                ++countOnes;
-                break;
-            case 2:
-                ++countTwos;
-                break;
-            case 3:
-                ++countThrees;
-                break;
-            case 4:
-                ++countFours;
-                break;
-            case 5:
-                ++countFives;
-                break;
-            case 6:
-                ++countSixes;
-                break;
-            case 7:
-                ++countSevens;
-                break;
-            case 8:
-                ++countEights;
-                break;
-            case 9:
-                ++countNines;
-                break;            
-            default: // 0 or junk value
-                break;
+            if(++countValue > 1) return false;
         }
     }
-
-    // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
-    if((countOnes | countTwos | countThrees
-        | countFours | countFives | countSixes 
-        | countSevens | countEights | countNines) > 1) return false;
-
-    else return true;
+    return true; // if we made it here value appears 0 or 1 times
 }
 
-bool isColumnValid(int8_t grid[9][9], int8_t column) // checks that the specified column does not violate Sudoku constraints
+bool isColumnValid(int8_t grid[9][9], int8_t column, int8_t value) // checks that the specified value does not appear more than once in the specified column
 {
-    int8_t countOnes = 0, countTwos = 0, countThrees = 0, countFours = 0, countFives = 0, countSixes = 0, countSevens = 0, countEights = 0, countNines = 0;
+    int8_t countValue = 0; // number of occurences of value in the column
 
     for(int8_t row=0; row<9; ++row)
     {
-        switch (grid[row][column])
+        if(grid[row][column] == value)
         {
-            case 1:
-                ++countOnes;
-                break;
-            case 2:
-                ++countTwos;
-                break;
-            case 3:
-                ++countThrees;
-                break;
-            case 4:
-                ++countFours;
-                break;
-            case 5:
-                ++countFives;
-                break;
-            case 6:
-                ++countSixes;
-                break;
-            case 7:
-                ++countSevens;
-                break;
-            case 8:
-                ++countEights;
-                break;
-            case 9:
-                ++countNines;
-                break;            
-            default: // 0 or junk value
-                break;
+            if(++countValue > 1) return false;
         }
     }
-
-    // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
-    if((countOnes | countTwos | countThrees
-        | countFours | countFives | countSixes 
-        | countSevens | countEights | countNines) > 1) return false;
-
-    else return true;
+    return true; // if we made it here value appears 0 or 1 times
 }
 
-bool isBoxValid(int8_t grid[9][9], int8_t row, int8_t column) // checks that the box containing the specified cell does not violate Sudoku constraints
+bool isBoxValid(int8_t grid[9][9], int8_t row, int8_t column, int8_t value) // checks that the specified value does not appear more than once in the specified box
 {
-    int8_t countOnes = 0, countTwos = 0, countThrees = 0, countFours = 0, countFives = 0, countSixes = 0, countSevens = 0, countEights = 0, countNines = 0;
+    int8_t countValue = 0; // number of occurences of value in the box
 
     // round down the current row and column to the nearest factor of 3
     int8_t rowOffset = 3*(row/3);
@@ -324,53 +145,22 @@ bool isBoxValid(int8_t grid[9][9], int8_t row, int8_t column) // checks that the
     {
         for(int8_t columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
         {
-            switch (grid[rowIt][columnIt])
+            if(grid[rowIt][columnIt] == value)
             {
-            case 1:
-                ++countOnes;
-                break;
-            case 2:
-                ++countTwos;
-                break;
-            case 3:
-                ++countThrees;
-                break;
-            case 4:
-                ++countFours;
-                break;
-            case 5:
-                ++countFives;
-                break;
-            case 6:
-                ++countSixes;
-                break;
-            case 7:
-                ++countSevens;
-                break;
-            case 8:
-                ++countEights;
-                break;
-            case 9:
-                ++countNines;
-                break;            
-            default: // 0 or junk value
-                break;
+                if(++countValue > 1) return false;
             }
         }
     }
-
-    // all values should be 0 or 1, so OR-ing them should be 0 or 1 also
-    if((countOnes | countTwos | countThrees
-        | countFours | countFives | countSixes 
-        | countSevens | countEights | countNines) > 1) return false;
-
-    else return true;
+    return true; // if we made it here value appears 0 or 1 times
 }
 
-inline bool isCellValid(int8_t grid[9][9], int8_t row, int8_t column) // checks that the regions of the grid containing the specified cell do not violate Sudoku constraints
+bool isCellValid(int8_t grid[9][9], int8_t row, int8_t column) // checks that the value at the specified cell does not violate Sudoku constraints
 {
-    if(isRowValid(grid, row) && isColumnValid(grid, column) && isBoxValid(grid, row, column))
-        return true; // all three regions are still valid
+    int8_t value = grid[row][column];
+
+    // check that the three regions containing the cell do not have the same value anywhere else
+    if(isRowValid(grid, row, value) && isColumnValid(grid, column, value) && isBoxValid(grid, row, column, value))
+        return true; 
     else return false;
 }
 
