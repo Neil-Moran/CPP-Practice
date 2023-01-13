@@ -16,7 +16,7 @@ void solve(char *fileIn, char *fileOut) // attempts to solve the grid from the i
     solver.solveFull();     
 }
 
-void solveN(char *fileIn, char *fileOut, int8_t countToSolve, int sleepTimeMs) // solves next N cells in the grid
+void solveN(char *fileIn, char *fileOut, int8_t countToSolve, int sleepTimeMs) // solves next N cells in the grid from the input file, and writes the result to the output file
 {
     solver solver(fileIn, fileOut);
     solver.solveN(countToSolve, sleepTimeMs);
@@ -190,7 +190,7 @@ solver::solver(char *fileIn, char *fileOut)
     }
 }
 
-void solver::solveFull()
+void solver::solveFull() // attempt to solve the grid fully by brute force
 {
     if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
     {
@@ -208,7 +208,7 @@ void solver::solveFull()
     else writeResult(); // write result to output file   
 }
 
-void solver::solveN(int8_t N, int SLEEP_TIME_MS)
+void solver::solveN(int8_t N, int SLEEP_TIME_MS) // solve the next N cells in the grid, set SLEEP_TIME_MS for an animated solve!
 {
     if(!isValid(grid)) // cannot solve grid as it already violates the constraints of Sudoku
     {
@@ -304,7 +304,7 @@ void solver::solveN(int8_t N, int SLEEP_TIME_MS)
     }
 }
 
-void solver::fillGridFromFile(char* fileIn) // writes the values from the file into the grid array and returns the count of empty cells
+void solver::fillGridFromFile(char* fileIn) // reads the values from the file into the grid array
 {
     countUnsolved = 0;
 
@@ -324,7 +324,7 @@ void solver::fillGridFromFile(char* fileIn) // writes the values from the file i
     fclose(input);
 }
 
-void solver::writeError(char* message)
+void solver::writeError(char* message) // writes the specified message to the output file
 {
     FILE *output;
     fopen_s(&output, file, "w+");
@@ -332,7 +332,7 @@ void solver::writeError(char* message)
     fclose(output);
 }
 
-void solver::writeResult()
+void solver::writeResult() // writes the current grid state to the output file
 {
     FILE *output;
     fopen_s(&output, file, "w+");

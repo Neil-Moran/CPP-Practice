@@ -1,8 +1,8 @@
 #pragma once
 #include <stdint.h>
 
-void solve(char *fileIn, char *fileOut);
-void solveN(char *fileIn, char *fileOut, int8_t countToSolve = 1, int sleepTimeMs = 0);
+void solve(char *fileIn, char *fileOut); // attempts to solve the grid from the input file by brute force, and writes the result to the output file
+void solveN(char *fileIn, char *fileOut, int8_t countToSolve = 1, int sleepTimeMs = 0); // solves next N cells in the grid from the input file, and writes the result to the output file
 
 struct cell
 {
@@ -20,8 +20,8 @@ struct solver
 {
     solver(char *fileIn, char *fileOut);
     
-    void solveFull();
-    void solveN(int8_t N = 1, int SLEEP_TIME_MS = 0);
+    void solveFull(); // attempt to solve the grid fully by brute force
+    void solveN(int8_t N = 1, int SLEEP_TIME_MS = 0); // solve the next N cells in the grid, set SLEEP_TIME_MS for an animated solve!
 
     private:
     int8_t grid[9][9];
