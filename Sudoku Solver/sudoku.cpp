@@ -10,16 +10,6 @@
 // Glossary of Sudoku Terms:
 // https://en.wikipedia.org/wiki/Glossary_of_Sudoku
 
-inline int getRow(int cell) // returns the row of the specified cell
-{
-    return cell/9;
-}
-
-inline int getColumn(int cell) // returns the column of the specified cell
-{
-    return 9 + (cell%9);
-}
-
 inline int getBox(int cell) // returns the box of the specified cell
 {
     return 18 + (3*(cell/27)) + ((cell%9)/3);
@@ -778,109 +768,24 @@ void solver::solveValueForRegion(int value, cell region[]) // checks where speci
 
                 if( (isRow(region) && (colOffset == 3*(candidateCells[1].column/3)) && (colOffset == 3*(candidateCells[2].column/3)))
                     || (isColumn(region) && (rowOffset == 3*(candidateCells[1].row/3)) && (rowOffset == 3*(candidateCells[2].row/3))))
+                {
+                    for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
                     {
-                        for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
+                        for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
                         {
-                            for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
+                            // clear possible value for non-candidate cells
+                            if(((rowIt != candidateCells[0].row) || (columnIt != candidateCells[0].column))
+                                && ((rowIt != candidateCells[1].row) || (columnIt != candidateCells[1].column))
+                                && ((rowIt != candidateCells[2].row) || (columnIt != candidateCells[2].column)))
                             {
-                                // clear possible value for non-candidate cells
-                                if(((rowIt != candidateCells[0].row) || (columnIt != candidateCells[0].column))
-                                    && ((rowIt != candidateCells[1].row) || (columnIt != candidateCells[1].column))
-                                    && ((rowIt != candidateCells[2].row) || (columnIt != candidateCells[2].column)))
-                                {
-                                    possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
+                                possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
 
-                                    assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
-                                }
+                                assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
                             }
                         }
                     }
+                }
             }
-            // if((region[0].row == region[8].row)) // if current region is a row, check if candidates are also in the same box
-            // {
-            //     int rowOffset = 3*(candidateCells[0].row/3);
-            //     int colOffset = 3*(candidateCells[0].column/3);
-
-            //     if((colOffset == 3*(candidateCells[1].column/3)) 
-            //         && (colOffset == 3*(candidateCells[2].column/3))) // candidates are in the same box
-            //     {
-            //         for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
-            //         {
-            //             for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
-            //             {
-            //                 // clear possible value for non-candidate cells
-            //                 if(((rowIt) != candidateCells[0].row))
-            //                 {
-            //                     possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
-
-            //                     assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-            // else if((region[0].column == region[8].column)) // else if current region is a column, check if candidates are also in the same box
-            // {
-            //     int rowOffset = 3*(candidateCells[0].row/3);
-            //     int colOffset = 3*(candidateCells[0].column/3);
-
-            //     if((rowOffset == 3*(candidateCells[1].row/3))
-            //         && (rowOffset == 3*(candidateCells[2].row/3))) // candidates are in the same box
-            //     {
-            //         for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
-            //         {
-            //             for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
-            //             {
-            //                 // clear possible value for non-candidate cells
-            //                 if(((columnIt) != candidateCells[0].column))
-            //                 {
-            //                     possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
-
-            //                     assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-            // else // else current region is a box, check if candidates are also in the same row or column
-            // {
-            //     if((candidateCells[0].row == candidateCells[1].row)
-            //         && (candidateCells[0].row == candidateCells[2].row)) // candidates are in the same row
-            //     {
-            //         int row = candidateCells[0].row;
-
-            //         for(int currCol=0; currCol<9; ++currCol)
-            //         {
-            //             // clear possible value for non-candidate cells
-            //             if((currCol != candidateCells[0].column) 
-            //                 && (currCol != candidateCells[1].column)
-            //                 && (currCol != candidateCells[2].column))
-            //             {
-            //                 possibleValuesMask[row][currCol] &= ~(1 << value);
-
-            //                 assert(possibleValuesMask[row][currCol] || grid[row][currCol]);
-            //             }
-            //         }
-            //     }
-            //     else if((candidateCells[0].column == candidateCells[1].column)
-            //             && (candidateCells[0].column == candidateCells[2].column)) // candidates are in the same column
-            //     {
-            //         int column = candidateCells[0].column;
-
-            //         for(int currRow=0; currRow<9; ++currRow)
-            //         {
-            //             // clear possible value for non-candidate cells
-            //             if((currRow != candidateCells[0].row) 
-            //                 && (currRow != candidateCells[1].row)
-            //                 && (currRow != candidateCells[2].row))
-            //             {
-            //                 possibleValuesMask[currRow][column] &= ~(1 << value);
-
-            //                 assert(possibleValuesMask[currRow][column] || grid[currRow][column]);
-            //             }
-            //         }
-            //     }
-            // }
         }
             break;
         default: break; // too many candidates, no info
