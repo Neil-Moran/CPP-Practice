@@ -9,9 +9,9 @@ inline bool isPowerOfTwo(int16_t n)
     return (n & (n-1)) == 0;
 }
 
-inline int getPowerOfTwo(int16_t n) // assumes n is a power of two
+inline int8_t getPowerOfTwo(int16_t n) // assumes n is a power of two
 {
-    int result = 1;
+    int8_t result = 1;
 
     while((n >> result) > 1) 
         ++result;
@@ -19,9 +19,9 @@ inline int getPowerOfTwo(int16_t n) // assumes n is a power of two
     return result;
 }
 
-inline int getCountBitsSet(int16_t n)
+inline int8_t getCountBitsSet(int16_t n)
 {
-    int result = 0;
+    int8_t result = 0;
 
     while(n)
     {
