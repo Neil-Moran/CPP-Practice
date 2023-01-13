@@ -770,6 +770,31 @@ void solver::solveValueForRegion(int value, cell region[]) // checks where speci
                         }
                     }
                 }
+            }            
+            else // else current region is a row or column, check if candidates are also in the same box
+            {
+                int rowOffset = 3*(candidateCells[0].row/3);
+                int colOffset = 3*(candidateCells[0].column/3);
+
+                if( (isRow(region) && (colOffset == 3*(candidateCells[1].column/3)) && (colOffset == 3*(candidateCells[2].column/3)))
+                    || (isColumn(region) && (rowOffset == 3*(candidateCells[1].row/3)) && (rowOffset == 3*(candidateCells[2].row/3))))
+                    {
+                        for(int rowIt=rowOffset; rowIt<3+rowOffset; ++rowIt)
+                        {
+                            for(int columnIt=colOffset; columnIt<3+colOffset; ++columnIt)
+                            {
+                                // clear possible value for non-candidate cells
+                                if(((rowIt != candidateCells[0].row) || (columnIt != candidateCells[0].column))
+                                    && ((rowIt != candidateCells[1].row) || (columnIt != candidateCells[1].column))
+                                    && ((rowIt != candidateCells[2].row) || (columnIt != candidateCells[2].column)))
+                                {
+                                    possibleValuesMask[rowIt][columnIt] &= ~(1 << value);
+
+                                    assert(possibleValuesMask[rowIt][columnIt] || grid[rowIt][columnIt]);
+                                }
+                            }
+                        }
+                    }
             }
             // if((region[0].row == region[8].row)) // if current region is a row, check if candidates are also in the same box
             // {
