@@ -16,5 +16,10 @@ struct game
 
     private:
     char* file;
+    int width, height;
     std::vector<std::vector<cell>> cells;
+
+    void calculate();
+    void update();
+    void write();
 };
