@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 const int NUM_ITERATIONS = 10;
-const int SLEEP_TIME_MS = 300;
+const int SLEEP_TIME_MS = 1000;
 
 game::game(char* fileIn, char* fileOut)
 {
@@ -25,19 +25,19 @@ game::game(char* fileIn, char* fileOut)
     
     int temp = -1;
 
-    for(int i=0; i<height; ++i)
+    for(int currRow=0; currRow<height; ++currRow)
     {
-        for(int j=0; j<width; ++j)
+        for(int currCol=0; currCol<width; ++currCol)
         {
             fscanf_s(input, "%d", &temp);
 
             if(temp == 1)
             {
-                cells[i][j].curr = true;
+                cells[currRow][currCol].curr = true;
             }
             else
             {
-                cells[i][j].curr = false;        
+                cells[currRow][currCol].curr = false;        
             }
         }
     }
@@ -60,23 +60,66 @@ void game::play()
 
 void game::calculate()
 {
-    for(int i=0; i<height; ++i)
+    // iterate over every cell and calculate if it should be alive next generation    
+    for(int currRow=0; currRow<height; ++currRow)
     {
-        for(int j=0; j<width; ++j)
+        for(int currCol=0; currCol<width; ++currCol)
         {
-            cells[i][j].next = cells[i][j].curr;            
+            if(calculateCell(currRow, currCol))
+                cells[currRow][currCol].next = true;
         }
     }
 }
 
+bool game::calculateCell(int row, int col)
+{
+    /* 
+        From https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#Rules:
+        - Any live cell with two or three live neighbours survives.
+        - Any dead cell with three live neighbours becomes a live cell.
+        - All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+    */
+
+   int countLiveNeighbours = 0;
+
+    // check state of all neighbours (NB: check neighbour exists, current cell may be on the edge of the grid)
+    for(int currRow = (row!=0) ? row-1 : 0; currRow<=row+1 && currRow<height; ++currRow)
+    {
+        for(int currCol = (col!=0) ? col-1 : 0; currCol<=col+1 && currCol<width; ++currCol)
+        {
+            if(currRow == row && currCol == col) continue; // ignore the current cell itself
+
+            if(cells[currRow][currCol].curr)
+            {
+                ++countLiveNeighbours;
+
+                if(countLiveNeighbours > 3) return false; // if 4+ live neighbours this cell will definitely die/stay dead, can stop here
+            }
+        }
+    }
+
+    if(cells[row][col].curr) // cell is currently alive
+    {
+        if(countLiveNeighbours >= 2) // we already checked above that countLiveNeighbours <= 3
+            return true;
+    }           
+    else // cell is currently dead
+    {
+        if(countLiveNeighbours == 3)
+            return true;
+    }
+
+    return false;
+}
+
 void game::update()
 {
-    for(int i=0; i<height; ++i)
+    for(int currRow=0; currRow<height; ++currRow)
     {
-        for(int j=0; j<width; ++j)
+        for(int currCol=0; currCol<width; ++currCol)
         {
-            cells[i][j].curr = cells[i][j].next;
-            cells[i][j].next = false;
+            cells[currRow][currCol].curr = cells[currRow][currCol].next;
+            cells[currRow][currCol].next = false;
         }
     }
 }
@@ -88,13 +131,13 @@ void game::write()
 
     fprintf(output, "%d %d", width, height);
 
-    for(int i=0; i<height; ++i)
+    for(int currRow=0; currRow<height; ++currRow)
     {
         fprintf(output, "\n");
 
-        for(int j=0; j<width; ++j)
+        for(int currCol=0; currCol<width; ++currCol)
         {
-            if(cells[i][j].curr)
+            if(cells[currRow][currCol].curr)
             {
                 fprintf(output, "1 ");
             }

@@ -20,6 +20,7 @@ struct game
     std::vector<std::vector<cell>> cells;
 
     void calculate();
+    bool calculateCell(int row, int col);
     void update();
     void write();
 };

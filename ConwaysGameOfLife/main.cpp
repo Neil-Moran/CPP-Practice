@@ -10,5 +10,9 @@ int main()
         game game1("input1.txt");
         game1.play();
     }
+    {
+        game game2("input2.txt");
+        game2.play();
+    }
     return 0;
 }
