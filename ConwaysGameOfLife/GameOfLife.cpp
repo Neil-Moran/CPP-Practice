@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <Windows.h>
 
-const int NUM_ITERATIONS = 100;
+const int NUM_ITERATIONS = 10;
 const int SLEEP_TIME_MS = 300;
 
 game::game(char* fileIn, char* fileOut)
@@ -41,6 +41,8 @@ game::game(char* fileIn, char* fileOut)
             }
         }
     }
+
+    fclose(input);
 }
 
 void game::play()
@@ -81,5 +83,27 @@ void game::update()
 
 void game::write()
 {
+    FILE *output;
+    fopen_s(&output, file, "w+");
 
+    fprintf(output, "%d %d", width, height);
+
+    for(int i=0; i<height; ++i)
+    {
+        fprintf(output, "\n");
+
+        for(int j=0; j<width; ++j)
+        {
+            if(cells[i][j].curr)
+            {
+                fprintf(output, "1 ");
+            }
+            else 
+            {
+                fprintf(output, "0 ");
+            }
+        }
+    }
+
+    fclose(output);
 }
