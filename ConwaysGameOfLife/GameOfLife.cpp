@@ -2,9 +2,6 @@
 #include <stdio.h>
 #include <Windows.h>
 
-const int NUM_ITERATIONS = 10;
-const int SLEEP_TIME_MS = 1000;
-
 game::game(char* fileIn, char* fileOut)
 {
     file = (fileOut && fileOut[0]) ? fileOut : fileIn; // if fileOut is null or empty output to the input file
@@ -45,11 +42,11 @@ game::game(char* fileIn, char* fileOut)
     fclose(input);
 }
 
-void game::play()
+void game::play(int NUM_GENERATIONS, int SLEEP_TIME_MS)
 {
     if(cells.empty()) return;
 
-    for(int loop=0; loop<NUM_ITERATIONS; ++loop)
+    for(int gen=0; gen<NUM_GENERATIONS; ++gen)
     {
         calculate();
         update();

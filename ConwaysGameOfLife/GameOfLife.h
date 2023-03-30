@@ -12,7 +12,7 @@ struct game
 {
     game(char* fileIn, char* fileOut = "");
 
-    void play();
+    void play(int NUM_GENERATIONS = 10, int SLEEP_TIME_MS = 1000);
 
     private:
     char* file;

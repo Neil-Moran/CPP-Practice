@@ -14,5 +14,9 @@ int main()
         game game2("input2.txt");
         game2.play();
     }
+    {
+        game game3("input3.txt", "output3.txt");
+        game3.play(150, 200);
+    }
     return 0;
 }
