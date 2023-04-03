@@ -2,7 +2,7 @@
 
 int main()
 {
-    DoubleLinkedList list1("a");
+    DoubleLinkedList list1("abc");
     
     return 0;
 }
