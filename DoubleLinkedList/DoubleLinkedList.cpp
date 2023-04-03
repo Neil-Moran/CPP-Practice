@@ -39,7 +39,7 @@ DoubleLinkedList::DoubleLinkedList()
 DoubleLinkedList::DoubleLinkedList(char *value)
 {
     #ifdef verbose
-    printf("Creating List with Head %s\n", value);
+    printf("Creating List with initial Node %s\n", value);
     #endif
 
     head = new Node(value);
@@ -54,4 +54,44 @@ DoubleLinkedList::~DoubleLinkedList()
 
     if(head)
         delete head;
+}
+
+void DoubleLinkedList::addHead(char *value)
+{
+    Node *n = new Node(value);
+    head->prev = n;
+    n->next = head;
+    head = n;
+}
+
+void DoubleLinkedList::addTail(char *value)
+{
+    Node *n = new Node(value);
+    tail->next = n;
+    n->prev = tail;
+    tail = n;
+}
+
+void DoubleLinkedList::print()
+{
+    Node *curr = head;
+
+    while(curr->next)
+    {
+        printf("%s <-> ", curr->value);
+        curr = curr->next;
+    }
+    printf("%s\n", curr->value);
+}
+
+void DoubleLinkedList::printReverse()
+{
+    Node *curr = tail;
+
+    while(curr->prev)
+    {
+        printf("%s <-> ", curr->value);
+        curr = curr->prev;
+    }
+    printf("%s\n", curr->value);
 }

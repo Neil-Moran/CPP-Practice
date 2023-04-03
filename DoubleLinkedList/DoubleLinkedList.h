@@ -2,10 +2,10 @@
 
 class Node
 {
+    public:
     char *value;
     Node *prev, *next;
-
-    public:
+    
     Node(char *value);
     ~Node();
 };
@@ -18,4 +18,9 @@ class DoubleLinkedList
     DoubleLinkedList();
     DoubleLinkedList(char *value);
     ~DoubleLinkedList();
+
+    void addHead(char *value);
+    void addTail(char *value);
+    void print();
+    void printReverse();
 };
