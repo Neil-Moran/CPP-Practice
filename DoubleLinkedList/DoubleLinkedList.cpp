@@ -1,4 +1,5 @@
 #include "DoubleLinkedList.h"
+#include "stringUtilities.h"
 #include <stdio.h>
 #define verbose // print various debug messages
 
@@ -71,6 +72,22 @@ void DoubleLinkedList::addTail(char *value)
     n->prev = tail;
     tail = n;
 }
+
+void DoubleLinkedList::insert(char *value)
+{
+    if(areStringsAlphabetized(value, head->value)) // new head
+    {
+        addHead(value);
+        return;
+    }
+
+    if(areStringsAlphabetized(tail->value, value)) // new tail
+    {
+        addTail(value);
+        return;
+    }
+}
+
 
 void DoubleLinkedList::print()
 {

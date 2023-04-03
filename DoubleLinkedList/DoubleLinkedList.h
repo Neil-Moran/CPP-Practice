@@ -21,6 +21,7 @@ class DoubleLinkedList
 
     void addHead(char *value);
     void addTail(char *value);
+    void insert(char *value);
     void print();
     void printReverse();
 };
