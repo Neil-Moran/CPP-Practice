@@ -60,22 +60,36 @@ DoubleLinkedList::~DoubleLinkedList()
 void DoubleLinkedList::addHead(char *value)
 {
     Node *n = new Node(value);
-    head->prev = n;
-    n->next = head;
+    if(head)
+    {
+        head->prev = n;
+        n->next = head;
+    }
+    else tail = n; // if list was empty the new head is also the new tail
+
     head = n;
 }
 
 void DoubleLinkedList::addTail(char *value)
 {
+    if(!head) // empty list
+    {
+        addHead(value);
+        return;
+    }
+
     Node *n = new Node(value);
-    tail->next = n;
-    n->prev = tail;
+    if(tail) // we checked there is a head above so this should always be true, but just in case
+    {   
+        tail->next = n;
+        n->prev = tail;
+    }
     tail = n;
 }
 
 void DoubleLinkedList::insert(char *value)
 {
-    if(areStringsAlphabetized(value, head->value)) // new head
+    if(!head || areStringsAlphabetized(value, head->value)) // new head
     {
         addHead(value);
         return;
@@ -106,12 +120,19 @@ void DoubleLinkedList::insert(char *value)
 
 void DoubleLinkedList::remove(char *value)
 {
+    if(!head) return; // empty list
+
     if(areStringsIdentical(value, head->value)) // remove head
     {
         Node *curr = head;
-        head = curr->next;
-        head->prev = 0;
-        curr->next = 0;
+        if(curr->next)
+        {
+            head = curr->next;
+            head->prev = 0;
+            curr->next = 0;
+        }
+        else head = 0; // list only had one node, now empty
+
         delete curr;
         return;
     }
@@ -119,9 +140,12 @@ void DoubleLinkedList::remove(char *value)
     if(areStringsIdentical(value, tail->value)) // remove tail
     {
         Node *curr = tail;
-        tail = curr->prev;
-        tail->next = 0;
-        curr->prev = 0;
+        if(curr->prev) // if list only had one node then head == tail and we shouldn't have gotten here, but just in case
+        {
+            tail = curr->prev;
+            tail->next = 0;
+            curr->prev = 0;
+        }
         delete curr;
         return;
     }
@@ -143,14 +167,18 @@ void DoubleLinkedList::remove(char *value)
             return;
         }
 
-        if(areStringsAlphabetized(value, curr->value)) return; // stop if value < curr value alphabetically; value cannot be in the list
-
         curr = curr->next;
     }    
 }
 
 void DoubleLinkedList::print()
 {
+    if(!head) 
+    {
+        printf("Empty List\n");
+        return;
+    }
+
     Node *curr = head;
 
     while(curr->next)
@@ -163,6 +191,12 @@ void DoubleLinkedList::print()
 
 void DoubleLinkedList::printReverse()
 {
+    if(!head) 
+    {
+        printf("Empty List\n");
+        return;
+    }
+
     Node *curr = tail;
 
     while(curr->prev)
