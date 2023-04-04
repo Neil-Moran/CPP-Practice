@@ -86,6 +86,22 @@ void DoubleLinkedList::insert(char *value)
         addTail(value);
         return;
     }
+
+    // find correct position in list
+    Node *curr = head;
+
+    // proceed to next node unless it comes after value alphabetically
+    while(areStringsAlphabetized(curr->next->value, value)) 
+    {
+        curr = curr->next;
+    }
+
+    // insert value between curr and curr->next
+    Node *n = new Node(value);
+    n->next = curr->next;
+    curr->next->prev = n;
+    n->prev = curr;
+    curr->next = n;
 }
 
 
