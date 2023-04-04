@@ -125,6 +125,28 @@ void DoubleLinkedList::remove(char *value)
         delete curr;
         return;
     }
+
+    // search for value in list
+    Node *curr = head->next;
+
+    while(curr != tail) // search for value until we reach the tail 
+    {
+        if(areStringsIdentical(value, curr->value)) // value found, remove it
+        {
+            Node *prev = curr->prev;
+            Node *next = curr->next;
+            curr->prev = 0;
+            curr->next = 0;
+            prev->next = next;
+            next->prev = prev;
+            delete curr;
+            return;
+        }
+
+        if(areStringsAlphabetized(value, curr->value)) return; // stop if value < curr value alphabetically; value cannot be in the list
+
+        curr = curr->next;
+    }    
 }
 
 void DoubleLinkedList::print()
