@@ -2,36 +2,36 @@
 #include <assert.h>
 #include "stringUtilities.h"
 
-bool test_alphabetized1_TwoEmptyStrings()
+bool test_Alphabetized1_TwoEmptyStrings()
 {
-    return(areStringsAlphabetized("", ""));
+    return areStringsAlphabetized("", "");
 }
 
-bool test_alphabetized2_FirstStringEmpty()
+bool test_Alphabetized2_FirstStringEmpty()
 {
-    return(areStringsAlphabetized("", "a"));
+    return areStringsAlphabetized("", "a");
 }
 
-bool test_alphabetized3_SecondStringEmpty()
+bool test_Alphabetized3_SecondStringEmpty()
 {
-    return(!areStringsAlphabetized("a", ""));
+    return !areStringsAlphabetized("a", "");
 }
 
-bool test_alphabetized4_StringsAreAlphabetized()
+bool test_Alphabetized4_StringsAreAlphabetized()
 {
-    return(areStringsAlphabetized("aardvark", "abacus"));
+    return areStringsAlphabetized("aardvark", "abacus");
 }
 
-bool test_alphabetized5_StringsAreNotAlphabetized()
+bool test_Alphabetized5_StringsAreNotAlphabetized()
 {
-    return(!areStringsAlphabetized("backward", "backgammon"));
+    return !areStringsAlphabetized("backward", "backgammon");
 }
 
 void test_areStringsAlphabetized()
 {
-    assert(test_alphabetized1_TwoEmptyStrings());
-    assert(test_alphabetized2_FirstStringEmpty());
-    assert(test_alphabetized3_SecondStringEmpty());
-    assert(test_alphabetized4_StringsAreAlphabetized());
-    assert(test_alphabetized5_StringsAreNotAlphabetized());
+    assert(test_Alphabetized1_TwoEmptyStrings());
+    assert(test_Alphabetized2_FirstStringEmpty());
+    assert(test_Alphabetized3_SecondStringEmpty());
+    assert(test_Alphabetized4_StringsAreAlphabetized());
+    assert(test_Alphabetized5_StringsAreNotAlphabetized());
 }
