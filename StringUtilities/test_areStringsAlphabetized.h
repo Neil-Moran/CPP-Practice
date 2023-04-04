@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h>
 #include "stringUtilities.h"
 
 bool test_alphabetized1_TwoEmptyStrings()
