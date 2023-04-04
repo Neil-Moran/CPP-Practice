@@ -104,6 +104,28 @@ void DoubleLinkedList::insert(char *value)
     curr->next = n;
 }
 
+void DoubleLinkedList::remove(char *value)
+{
+    if(areStringsIdentical(value, head->value)) // remove head
+    {
+        Node *curr = head;
+        head = curr->next;
+        head->prev = 0;
+        curr->next = 0;
+        delete curr;
+        return;
+    }
+
+    if(areStringsIdentical(value, tail->value)) // remove tail
+    {
+        Node *curr = tail;
+        tail = curr->prev;
+        tail->next = 0;
+        curr->prev = 0;
+        delete curr;
+        return;
+    }
+}
 
 void DoubleLinkedList::print()
 {

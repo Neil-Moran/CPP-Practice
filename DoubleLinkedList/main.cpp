@@ -8,6 +8,8 @@ int main()
     list1.insert("a");
     list1.insert("f");
     list1.insert("e");
+    list1.remove("a");
+    list1.remove("f");
     list1.print();
     list1.printReverse();
     
