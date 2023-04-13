@@ -27,5 +27,24 @@ int main()
         list1.printReverse();
     }
 
+    {
+        char* cheeseInput[] = 
+        {
+            "Gouda", "Edam", "Camembert", "Gran Padano", 
+            "Parmegianno", "Brie", "Edam", "Cheddar",
+            "Camembert", "Gorgonzola", "Emmenthal", "Pecorino"
+        };
+        
+        DoubleLinkedList cheeseList;
+
+        for(int i=0; i<(sizeof(cheeseInput)/sizeof(char*)); ++i) // insert the cheeses into the list, omitting duplicates
+        {
+            if(!cheeseList.find(cheeseInput[i]))
+                cheeseList.insert(cheeseInput[i]);
+        }
+        cheeseList.print();
+        cheeseList.printReverse();
+    }
+
     return 0;
 }

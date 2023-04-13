@@ -118,6 +118,18 @@ void DoubleLinkedList::insert(char *value)
     curr->next = n;
 }
 
+Node *DoubleLinkedList::find(char *value)
+{
+    if(!head) return 0; // empty list
+
+    for(Node *curr = head; curr->next != 0; curr = curr->next)
+    {
+        if(areStringsIdentical(value, curr->value))
+            return curr;
+    }
+    return 0;
+}
+
 void DoubleLinkedList::remove(char *value)
 {
     if(!head) return; // empty list
