@@ -9,3 +9,8 @@ bool areStringsAlphabetized(char *s1, char *s2);
 // returns true if s1 and s2 are completely identical, 
 // including punctuation, white space, capitalization...
 bool areStringsIdentical(char *s1, char *s2);
+
+// returns s as a signed integer, or 0 if s is not a valid int
+// valid examples: "0", "-123", "999", "+2147483647"
+// invalid examples: "", "one", "0x123","-2147483648" (exceeds max int)
+int convertStringToInt(char * s);
