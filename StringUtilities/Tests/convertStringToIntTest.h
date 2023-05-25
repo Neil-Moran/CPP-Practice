@@ -82,6 +82,11 @@ bool test_StoI16_VeryLargeNegativeNumber()
     return (convertStringToInt("-92147483647") == 0);
 }
 
+bool test_StoI17_LeadingZero()
+{
+    return (convertStringToInt("0999") == 999);
+}
+
 void test_convertStringToInt()
 {
     assert(test_StoI1_EmptyString());
@@ -99,4 +104,5 @@ void test_convertStringToInt()
     assert(test_StoI14_NegativeZero());
     assert(test_StoI15_PositiveZero());
     assert(test_StoI16_VeryLargeNegativeNumber());
+    assert(test_StoI17_LeadingZero());
 }

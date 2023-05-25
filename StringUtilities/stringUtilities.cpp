@@ -37,7 +37,7 @@ int convertStringToInt(char * s)
     int size = 1;
     while(s[size]) ++size;
 
-    if(size > 11) return 0; // ERROR: string is longer than "+2147483647", will overflow 
+    if(size > sizeof("+2147483647")-1) return 0; // ERROR: string is longer than "+2147483647" (minus null terminator), will overflow 
 
     int result = 0;
     int multiplier = (s[0] == '-') ? -1 : 1; // if first char is '-' we want to subtract the running total, else add
