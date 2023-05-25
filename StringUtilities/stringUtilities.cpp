@@ -30,7 +30,7 @@ bool areStringsIdentical(char *s1, char *s2)
     else return false;
 }
 
-int convertStringToInt(char * s)
+int convertStringToInt(char *s)
 {
     if(!s[0]) return 0; // empty string
 
@@ -51,8 +51,7 @@ int convertStringToInt(char * s)
         else result += (s[i]-48) * multiplier;
     }
 
-    if(result < 0 && s[0] != '-') return 0; // ERROR: overflow, string exceeded max int
-    if(result > 0 && s[0] == '-') return 0; // ERROR: underflow, string exceeded min int
+    if((result < 0) ^ (s[0] == '-')) return 0; // ERROR: over/underflow, string exceeded int limits
 
     return result;
 }
