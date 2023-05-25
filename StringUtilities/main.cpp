@@ -1,15 +1,9 @@
 #include <stdio.h>
-#include "test_areStringsAlphabetized.h"
-#include "test_areStringsIdentical.h"
-#include "test_convertStringToInt.h"
+#include "Tests/runAllTests.cpp"
 
 int main()
 {
-    test_areStringsAlphabetized();
-    test_areStringsIdentical();
-    test_convertStringToInt();
-
-    printf("All Tests Passed!\n");
+    runAllTests();
 
     return 0;
 }
