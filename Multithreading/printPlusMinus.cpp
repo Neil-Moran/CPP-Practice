@@ -18,4 +18,6 @@ void printPlusMinus()
 
     worker1.join();
     worker2.join();
+    
+    printf("\n");
 }
