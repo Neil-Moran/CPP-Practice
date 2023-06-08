@@ -30,12 +30,21 @@ bool areStringsIdentical(char *s1, char *s2)
     else return false;
 }
 
-int convertStringToInt(char *s)
+int getStringSize(char *s)
 {
     if(!s[0]) return 0; // empty string
 
     int size = 1;
     while(s[size]) ++size;
+
+    return size;
+}
+
+int convertStringToInt(char *s)
+{
+    if(!s[0]) return 0; // empty string
+
+    int size = getStringSize(s);
 
     if(size > sizeof("+2147483647")-1) return 0; // ERROR: string is longer than "+2147483647" (minus null terminator), will overflow 
 
@@ -54,4 +63,54 @@ int convertStringToInt(char *s)
     if((result < 0) ^ (s[0] == '-')) return 0; // ERROR: over/underflow, string exceeded int limits
 
     return result;
+}
+
+int partition(char s[], int low, int high)
+{
+    char pivot = s[high]; //select the right-most element as a pivot (arbitrary)
+    int pi = low; // will be the partition index, the index where the pivot belongs
+
+    //find the correct index for the pivot
+    for(int i=low; i<high; ++i)
+    {
+        if(s[i]<=pivot)
+        {
+            if(i!=pi)
+            {
+                char temp = s[pi];
+                s[pi] = s[i];
+                s[i] = temp;
+            }
+            ++pi;
+        }
+    }
+
+    if(pi != high) //move the pivot to the correct index, if not already there
+    {
+        char temp = s[pi];
+        char temp2 = s[high];
+        s[pi] = temp2;
+        s[high] = temp;
+    }
+    return pi;
+}
+
+void quickSort(char s[], int low, int high)
+{
+    if(low < high)
+    {
+        int pivot = partition(s, low, high);
+        
+        quickSort(s, low, pivot-1);
+        quickSort(s, pivot+1, high);
+    }
+}
+
+void sortString(char s[])
+{
+    if(!s[0]) return; // empty string
+
+    int size = getStringSize(s);
+
+    quickSort(s, 0, size-1);
 }

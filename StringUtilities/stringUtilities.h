@@ -1,5 +1,7 @@
 #pragma once
 
+// NB: assuming null-terminated strings for all functions
+
 // returns true if s1 and s2 are in alphabetical order
 // returns true in the case of a tie
 // NB:  only tested on strings containing only letters from the Roman alphabet
@@ -14,3 +16,7 @@ bool areStringsIdentical(char *s1, char *s2);
 // valid examples: "0", "-123", "999", "+2147483647"
 // invalid examples: "", "one", "0x123","-2147483648" (exceeds max int)
 int convertStringToInt(char *s);
+
+// sorts the string into alphabetical order
+// only testing for strings comprising lowercase a-z
+void sortString(char s[]);
