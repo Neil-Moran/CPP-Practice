@@ -8,9 +8,7 @@
 
 void runAllTests()
 {
-    test_areStringsAlphabetized();
-    test_areStringsIdentical();
     test_convertStringToInt();
-    
-    if(sortStringTest()) printf("All Tests Passed!\n");
+
+    if(areStringsAlphabetizedTest() && areStringsIdenticalTest() && sortStringTest()) printf("All Tests Passed!\n");
 }

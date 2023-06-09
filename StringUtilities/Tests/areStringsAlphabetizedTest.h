@@ -1,37 +1,17 @@
 #pragma once
-#include <assert.h>
+
+#include "nam_test.h"
 #include "stringUtilities.h"
 
-bool test_Alphabetized1_TwoEmptyStrings()
+bool areStringsAlphabetizedTest()
 {
-    return areStringsAlphabetized("", "");
-}
+    stringStringBoolTest areStringsAlphabetizedTest("areStringsAlphabetized()", areStringsAlphabetized);
 
-bool test_Alphabetized2_FirstStringEmpty()
-{
-    return areStringsAlphabetized("", "a");
-}
-
-bool test_Alphabetized3_SecondStringEmpty()
-{
-    return !areStringsAlphabetized("a", "");
-}
-
-bool test_Alphabetized4_StringsAreAlphabetized()
-{
-    return areStringsAlphabetized("aardvark", "abacus");
-}
-
-bool test_Alphabetized5_StringsAreNotAlphabetized()
-{
-    return !areStringsAlphabetized("backward", "backgammon");
-}
-
-void test_areStringsAlphabetized()
-{
-    assert(test_Alphabetized1_TwoEmptyStrings());
-    assert(test_Alphabetized2_FirstStringEmpty());
-    assert(test_Alphabetized3_SecondStringEmpty());
-    assert(test_Alphabetized4_StringsAreAlphabetized());
-    assert(test_Alphabetized5_StringsAreNotAlphabetized());
+    areStringsAlphabetizedTest.addTestCase("Two Empty Strings", "", "", true);
+    areStringsAlphabetizedTest.addTestCase("First String Empty", "", "a", true);
+    areStringsAlphabetizedTest.addTestCase("Second String Empty", "a", "", false);
+    areStringsAlphabetizedTest.addTestCase("Strings Are Alphabetized", "aardvark", "abacus", true);
+    areStringsAlphabetizedTest.addTestCase("Strings Are Not Alphabetized", "backward", "backgammon", false);
+    
+    return areStringsAlphabetizedTest.runAllTests();
 }
