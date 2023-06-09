@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#define NAM_RED "\033[0;31m"
+#define NAM_GREEN "\033[0;32m"
+#define NAM_RESET "\n\033[0m"
+
 /*  A specific test case for a function with an input of two strings and output of bool
     testCaseName: a description of what use case you're testing
     input1: first input string
@@ -23,7 +27,7 @@ struct stringStringBoolTestCase
     {
         if(testFunction(input1, input2) != expectedResult)
         {
-            printf("\033[0;31m%s failed; Actual: %s Expected: %s\n\033[0m", testCaseName, expectedResult ? "false" : "true", expectedResult ? "true" : "false");
+            printf(NAM_RED "%s failed; Actual: %s Expected: %s" NAM_RESET, testCaseName, expectedResult ? "false" : "true", expectedResult ? "true" : "false");
             return false;
         }
         return true;
@@ -59,12 +63,12 @@ struct stringStringBoolTest
 
         if(failedTests > 0)
         {
-            printf("\033[0;31m%s: %i/%i tests failed\n\033[0m", testName, failedTests, testCases.size());
+            printf(NAM_RED "%s: %i/%i tests failed" NAM_RESET, testName, failedTests, testCases.size());
             return false;
         }
         else 
         {
-            printf("\033[0;32m%s: All tests passed\n\033[0m", testName);
+            printf(NAM_GREEN "%s: All tests passed" NAM_RESET, testName);
             return true;
         }
     }
@@ -90,7 +94,7 @@ struct stringIntTestCase
 
         if(actualResult != expectedResult)
         {
-            printf("\033[0;31m%s failed; Actual: %i Expected: %i\n\033[0m", testCaseName, actualResult, expectedResult);
+            printf(NAM_RED "%s failed; Actual: %i Expected: %i" NAM_RESET, testCaseName, actualResult, expectedResult);
             return false;
         }
         return true;
@@ -126,12 +130,12 @@ struct stringIntTest
 
         if(failedTests > 0)
         {
-            printf("\033[0;31m%s: %i/%i tests failed\n\033[0m", testName, failedTests, testCases.size());
+            printf(NAM_RED "%s: %i/%i tests failed" NAM_RESET, testName, failedTests, testCases.size());
             return false;
         }
         else 
         {
-            printf("\033[0;32m%s: All tests passed\n\033[0m", testName);
+            printf(NAM_GREEN "%s: All tests passed" NAM_RESET, testName);
             return true;
         }
     }
@@ -159,7 +163,7 @@ struct stringStringTestCase
 
         if(!compareFunction(actualResult, expectedResult))
         {
-            printf("\033[0;31m%s failed; Actual: %s Expected: %s\n\033[0m", testCaseName, actualResult, expectedResult);
+            printf(NAM_RED "%s failed; Actual: %s Expected: %s" NAM_RESET, testCaseName, actualResult, expectedResult);
             return false;
         }
         return true;
@@ -199,12 +203,12 @@ struct stringStringTest
 
         if(failedTests > 0)
         {
-            printf("\033[0;31m%s: %i/%i tests failed\n\033[0m", testName, failedTests, testCases.size());
+            printf(NAM_RED "%s: %i/%i tests failed" NAM_RESET, testName, failedTests, testCases.size());
             return false;
         }
         else 
         {
-            printf("\033[0;32m%s: All tests passed\n\033[0m", testName);
+            printf(NAM_GREEN "%s: All tests passed" NAM_RESET, testName);
             return true;
         }
     }

@@ -65,6 +65,51 @@ int convertStringToInt(char *s)
     return result;
 }
 
+bool isAnagram(char *s1, char *s2)
+{
+    // algorithm to calculate isAnagram without sorting/modifying either string
+    // we store the first 26 primes > 1, each maps to a letter, e.g. A = 2, E = 11
+    // we iterate through the strings and calculate the product of their primes
+    // at the end the products should match for anagrams, even if the int overflows!
+    // NB: any chars other than a-z, A-Z are ignored
+    int primes[26] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101};
+
+    int product_s1 = 1;
+    int i=0;
+
+    while(s1[i])
+    {
+        if('a' <= s1[i] && s1[i] <= 'z')
+        {
+            product_s1 *= primes[s1[i] - 'a'];
+        }
+        else if('A' <= s1[i] && s1[i] <= 'Z')
+        {
+            product_s1 *= primes[s1[i] - 'A'];
+        }
+        ++i;
+    }
+
+    int product_s2 = 1;
+    i=0;
+
+    while(s2[i])
+    {
+        if('a' <= s2[i] && s2[i] <= 'z')
+        {
+            product_s2 *= primes[s2[i] - 'a'];
+        }
+        else if('A' <= s2[i] && s2[i] <= 'Z')
+        {
+            product_s2 *= primes[s2[i] - 'A'];
+        }
+        ++i;
+    }
+
+    if(product_s1 == product_s2) return true;
+    else return false;
+}
+
 int partition(char s[], int low, int high)
 {
     char pivot = s[high]; //select the right-most element as a pivot (arbitrary)

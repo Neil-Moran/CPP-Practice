@@ -17,6 +17,11 @@ bool areStringsIdentical(char *s1, char *s2);
 // invalid examples: "", "one", "0x123","-2147483648" (exceeds max int)
 int convertStringToInt(char *s);
 
+// returns true if s1 and s2 are anagrams of each other
+// ignores case, i.e. isAnagram(Neil, line) = true
+// ignores characters other than a-z, A-Z, i.e. isAnagram(racecar, car race!) = true
+bool isAnagram(char *s1, char *s2); 
+
 // sorts the string into alphabetical order
 // only testing for strings comprising lowercase a-z
 void sortString(char s[]);
