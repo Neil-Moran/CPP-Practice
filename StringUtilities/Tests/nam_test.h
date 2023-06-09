@@ -23,7 +23,7 @@ struct stringStringBoolTestCase
     {
         if(testFunction(input1, input2) != expectedResult)
         {
-            printf("%s failed; Actual: %s Expected: %s\n", testCaseName, expectedResult ? "false" : "true", expectedResult ? "true" : "false");
+            printf("\033[0;31m%s failed; Actual: %s Expected: %s\n\033[0m", testCaseName, expectedResult ? "false" : "true", expectedResult ? "true" : "false");
             return false;
         }
         return true;
@@ -59,12 +59,79 @@ struct stringStringBoolTest
 
         if(failedTests > 0)
         {
-            printf("%s: %i/%i tests failed\n", testName, failedTests, testCases.size());
+            printf("\033[0;31m%s: %i/%i tests failed\n\033[0m", testName, failedTests, testCases.size());
             return false;
         }
         else 
         {
-            printf("%s: All tests passed\n", testName);
+            printf("\033[0;32m%s: All tests passed\n\033[0m", testName);
+            return true;
+        }
+    }
+};
+
+/*  A specific test case for a function with an input of string and output of int
+    testCaseName: a description of what use case you're testing
+    inputString: input string
+    expectedResult: output int
+*/
+struct stringIntTestCase
+{
+    char *testCaseName;
+    char *inputString;
+    int expectedResult;
+
+    stringIntTestCase(char *_testCaseName, char *_inputString, int _expectedResult) 
+        : testCaseName(_testCaseName), inputString(_inputString), expectedResult(_expectedResult){}
+
+    bool run(int (*testFunction)(char*))
+    {
+        int actualResult = testFunction(inputString);
+
+        if(actualResult != expectedResult)
+        {
+            printf("\033[0;31m%s failed; Actual: %i Expected: %i\n\033[0m", testCaseName, actualResult, expectedResult);
+            return false;
+        }
+        return true;
+    }
+};
+
+/*  A test for a function with an input of string and output of int
+    testName: a descriptive name (I recommend the function you're testing)
+    testFunction: the function you're testing
+*/
+struct stringIntTest
+{
+    char *testName;
+    int (*testFunction)(char*);
+    std::vector<stringIntTestCase> testCases;
+
+    stringIntTest(char *_testName, int (*_testFunction)(char*))
+    : testName(_testName), testFunction(_testFunction) {}
+
+    void addTestCase(char *testCaseName, char *inputString, int expectedResult)
+    {
+        testCases.push_back(stringIntTestCase(testCaseName, inputString, expectedResult));
+    }
+
+    bool runAllTests()
+    {
+        int failedTests = 0;
+
+        for(size_t i=0; i<testCases.size(); ++i)
+        {
+            if(!testCases[i].run(testFunction)) ++failedTests;
+        }
+
+        if(failedTests > 0)
+        {
+            printf("\033[0;31m%s: %i/%i tests failed\n\033[0m", testName, failedTests, testCases.size());
+            return false;
+        }
+        else 
+        {
+            printf("\033[0;32m%s: All tests passed\n\033[0m", testName);
             return true;
         }
     }
@@ -92,7 +159,7 @@ struct stringStringTestCase
 
         if(!compareFunction(actualResult, expectedResult))
         {
-            printf("%s failed; Actual: %s Expected: %s\n", testCaseName, actualResult, expectedResult);
+            printf("\033[0;31m%s failed; Actual: %s Expected: %s\n\033[0m", testCaseName, actualResult, expectedResult);
             return false;
         }
         return true;
@@ -132,14 +199,13 @@ struct stringStringTest
 
         if(failedTests > 0)
         {
-            printf("%s: %i/%i tests failed\n", testName, failedTests, testCases.size());
+            printf("\033[0;31m%s: %i/%i tests failed\n\033[0m", testName, failedTests, testCases.size());
             return false;
         }
         else 
         {
-            printf("%s: All tests passed\n", testName);
+            printf("\033[0;32m%s: All tests passed\n\033[0m", testName);
             return true;
         }
     }
 };
-

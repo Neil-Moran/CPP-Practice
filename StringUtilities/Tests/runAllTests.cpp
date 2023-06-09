@@ -8,7 +8,11 @@
 
 void runAllTests()
 {
-    test_convertStringToInt();
+    bool allTestsPassed = true;
+    allTestsPassed &= areStringsAlphabetizedTest(); 
+    allTestsPassed &= areStringsIdenticalTest();
+    allTestsPassed &= convertStringToIntTest();
+    allTestsPassed &= sortStringTest();
 
-    if(areStringsAlphabetizedTest() && areStringsIdenticalTest() && sortStringTest()) printf("All Tests Passed!\n");
+    if(allTestsPassed) printf("\033[0;32mAll Tests Passed!\n\033[0m");
 }
