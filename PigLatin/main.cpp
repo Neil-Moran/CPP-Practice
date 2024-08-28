@@ -1,10 +1,13 @@
 #include "PigLatin.h"
-#include <array>
 #include <stdio.h>
+#include <vector>
 
 int main()
 {
-    std::array<std::string, 9> input{"nix", "apple", "eye", "indigo", "orb", "under", "yacht", "stick", "sentence in pig latin"};
+    std::vector<std::string> input 
+    {
+        "nix", "apple", "eye", "indigo", "orb", "under", "yacht", "stick", "rhythm", "sentence in pig latin"
+    };
 
     for(auto& s : input)
     {

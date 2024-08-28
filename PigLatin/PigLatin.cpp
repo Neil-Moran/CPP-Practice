@@ -26,7 +26,7 @@ std::string EngtoPig(std::string s)
         else
         {
             int i = 1;
-            while(token[i] && !isVowel(token[i]))
+            while(token[i] && !isVowel(token[i]) && token[i] != 'y')
             {
                 ++i;
             }
