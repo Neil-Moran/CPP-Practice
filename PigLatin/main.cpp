@@ -4,7 +4,7 @@
 
 int main()
 {
-    std::array<std::string, 6> input{"nix", "apple", "eye", "indigo", "orb", "under"};
+    std::array<std::string, 7> input{"nix", "apple", "eye", "indigo", "orb", "under", "sentence in pig latin"};
 
     for(auto& s : input)
     {
