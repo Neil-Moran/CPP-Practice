@@ -6,7 +6,8 @@ int main()
 {
     std::vector<std::string> input 
     {
-        "nix", "apple", "eye", "indigo", "orb", "under", "yacht", "stick", "rhythm", "sentence in pig latin"
+        "nix", "apple", "eye", "indigo", "orb", "under", "yacht", "stick", "rhythm", 
+        "sentence in pig latin", "The Quick Brown Fox Jumps Over the Lazy Dog"
     };
 
     for(auto& s : input)
