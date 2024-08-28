@@ -25,10 +25,15 @@ std::string EngtoPig(std::string s)
 
         else
         {
-            result += token.substr(1) + token[0] + "ay ";
+            int i = 1;
+            while(token[i] && !isVowel(token[i]))
+            {
+                ++i;
+            }
+
+            result += token.substr(i) + token.substr(0, i) + "ay ";
         }
     }
 
     return result;
 }
-
