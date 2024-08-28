@@ -1,10 +1,15 @@
 #include "PigLatin.h"
+#include <array>
 #include <stdio.h>
 
 int main()
 {
-    std::string eng = "nix";
-    printf("%s : %s\n", eng.c_str(), EngtoPig(eng).c_str());
-    
+    std::array<std::string, 6> input{"nix", "apple", "eye", "indigo", "orb", "under"};
+
+    for(auto& s : input)
+    {
+        printf("%s\t: %s\n", s.c_str(), EngtoPig(s).c_str());
+    }
+
     return 0;
 }
