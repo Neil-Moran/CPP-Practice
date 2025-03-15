@@ -1,19 +1,21 @@
 #pragma once
 #include <string>
 
-std::string rot13(std::string w)
+using std::string;
+
+string rot13(string w)
 {
-    std::string result = w;
+    string result = w;
 
     for(int i=0; result[i]; ++i)
     {
-        if(result[i] > 'a' && result[i] <= 'm'
-            || result[i] > 'A' && result[i] < 'M')
+        if(result[i] >= 'a' && result[i] <= 'm'
+            || result[i] >= 'A' && result[i] <= 'M')
         {
             result[i] += 13;
         }
-        else if(result[i] > 'm' && result[i] <= 'z'
-            || result[i] > 'M' && result[i] < 'Z')
+        else if(result[i] >= 'n' && result[i] <= 'z'
+            || result[i] >= 'N' && result[i] <= 'Z')
         {
             result[i] -=13;
         }
