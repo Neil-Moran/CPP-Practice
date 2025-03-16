@@ -31,6 +31,8 @@ string rot13(string w)
     return w;
 }
 
+// using the input file as a dictionary, search for words that ROT13 to other valid words,
+// ignoring all words shorter than the minimum length
 string findRot13Pairs(string file, size_t minLength)
 {
     std::vector<string> wordList;
